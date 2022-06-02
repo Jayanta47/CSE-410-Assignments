@@ -8,6 +8,7 @@
 #define pi (2*acos(0.0))
 #define ANTICLOCKWISE 1
 #define CLOCKWISE -1
+#define MAX_THRESH 40.0
 
 double cameraHeight;
 double cameraAngle;
@@ -17,6 +18,7 @@ double angle;
 
 int translation_unit = 2;
 double rotation_unit = 3; // in degrees
+
 
 double deg2Rad(double angle)
 {

@@ -1,5 +1,6 @@
 #include "vector.h"
 
+double sphr2cubeRate = 1.0;
 
 // global variables initialization
 Point pos, U, R, L;
@@ -137,7 +138,7 @@ void drawGrid()
 
 void drawSquare(double a)
 {
-    //glColor3f(1.0,0.0,0.0);
+    glColor3f(1.0,0.0,0.0);
 	glBegin(GL_QUADS);{
 		glVertex3f( a, a,0);
 		glVertex3f( a,-a,0);
@@ -399,8 +400,9 @@ void drawCyliderSegment()
     // segment 4: (-,+,+) to (-,-,+)
     glPushMatrix();
     {
-        glTranslatef(-sq_side, sq_side, 0);
-        glRotated(-90, 1, 0, 0);
+        glTranslatef(-sq_side, 0, sq_side);
+        glRotated(90, 0, 0, 1);
+        glRotated(-90, 0, 1, 0);
         drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
@@ -408,28 +410,38 @@ void drawCyliderSegment()
     // segment 5: (+,+,-) to (-,+,-)
     glPushMatrix();
     {
-
+        glTranslatef(0, sq_side, -sq_side);
+        glRotated(90, 0, 1, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
 
     // segment 6: (+,+,-) to (+,-,-)
     glPushMatrix();
     {
-
+        glTranslatef(sq_side, 0, -sq_side);
+        glRotated(-90, 1, 0, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
 
     // segment 7: (+,-,-) to (-,-,-)
     glPushMatrix();
     {
-
+        glTranslatef(0, -sq_side, -sq_side);
+        glRotated(-90, 1, 0, 0);
+        glRotated(90, 0, 1, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
 
     // segment 8: (-,+,-) to (-,-,-)
     glPushMatrix();
     {
-
+        glTranslatef(-sq_side, 0, -sq_side);
+        glRotated(90, 0, 0, 1);
+        glRotated(90, 0, 1, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
 
@@ -469,21 +481,79 @@ void drawCyliderSegment()
     glPopMatrix();
 }
 
+void drawSquareSideSegment()
+{
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(sq_side+radius_curv, 0, 0);
+        glRotated(90, 0,1,0);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(-sq_side-radius_curv, 0, 0);
+        glRotated(90, 0,1,0);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(0, sq_side+radius_curv, 0);
+        glRotated(90, 1,0,0);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(0,-sq_side-radius_curv, 0);
+        glRotated(90, 1,0,0);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(0,0, sq_side+radius_curv);
+//        glRotated(90, 0,1,0);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+    // segment 1:
+    glPushMatrix();
+    {
+        glTranslated(0,0,-sq_side-radius_curv);
+        drawSquare(sq_side);
+    }
+    glPopMatrix();
+
+}
+
 void drawSS()
 {
-    glColor3f(1,0,0);
-    drawSquare(20);
+//    glColor3f(1,0,0);
+//    drawSquare(20);
 
 //    drawSphere(30, 25, 50, 4, false);
 //    drawCylinder(radius_curv, 2*sq_side, 50, 4);
     drawSphereSegment();
     drawCyliderSegment();
+    drawSquareSideSegment();
 
-    glRotatef(angle,0,0,1);
-    glTranslatef(110,0,0);
-    glRotatef(2*angle,0,0,1);
-    glColor3f(0,1,0);
-    drawSquare(15);
+//    glRotatef(angle,0,0,1);
+//    glTranslatef(110,0,0);
+//    glRotatef(2*angle,0,0,1);
+//    glColor3f(0,1,0);
+//    drawSquare(15);
 //
 //    glPushMatrix();
 //    {
@@ -537,6 +607,32 @@ void keyboardListener(unsigned char key, int x,int y){
             tilt_counter_clockwise();
 			break;
 
+        case 't':
+            if (translation_unit < 30)
+            { translation_unit++; }
+            break;
+
+        case 'r':
+            if (rotation_unit < 30.0) rotation_unit++;
+            break;
+
+        case 's':
+            if (sphr2cubeRate < 5.0) sphr2cubeRate++;
+            break;
+
+        case 'T':
+            if (translation_unit > 0)
+            { translation_unit--; }
+            break;
+
+        case 'R':
+            if (rotation_unit > 0.0) rotation_unit--;
+            break;
+
+        case 'S':
+            if (sphr2cubeRate > 0.0) sphr2cubeRate--;
+            break;
+
 		default:
 			break;
 	}
@@ -570,11 +666,17 @@ void specialKeyListener(int key, int x,int y){
 			break;
 
 		case GLUT_KEY_INSERT:
+
 			break;
 
 		case GLUT_KEY_HOME:
+		    sq_side = max(0.0, sq_side - sphr2cubeRate);
+		    radius_curv = min(MAX_THRESH,radius_curv + sphr2cubeRate);
 			break;
+
 		case GLUT_KEY_END:
+            sq_side = min(MAX_THRESH, sq_side + sphr2cubeRate);
+		    radius_curv = max(0.0, radius_curv - sphr2cubeRate);
 			break;
 
 		default:
@@ -646,19 +748,8 @@ void display(){
 	drawAxes();
 	drawGrid();
 
-    //glColor3f(1,0,0);
-    //drawSquare(10);
 
     drawSS();
-
-    //drawCircle(30,24);
-
-    //drawCone(20,50,24);
-
-	//drawSphere(30,24,20);
-
-
-
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
@@ -678,8 +769,8 @@ void init(){
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
-	sq_side = 10;
-	radius_curv = 10;
+	sq_side = 20;
+	radius_curv = 20;
 
 	//clear the screen
 	glClearColor(0,0,0,0);
