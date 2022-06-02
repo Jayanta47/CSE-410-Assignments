@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1654166054 source:d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\opengl_offline\main.cpp
+1654185988 source:d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\opengl_offline\main.cpp
 	"vector.h"
 
 1654162792 d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\opengl_offline\vector.cpp
@@ -244,7 +244,7 @@
 	<windows.h>
 	<GL/glut.h>
 
-1654166242 d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\opengl_offline\vector.h
+1654178382 d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\opengl_offline\vector.h
 	<stdio.h>
 	<stdlib.h>
 	<math.h>

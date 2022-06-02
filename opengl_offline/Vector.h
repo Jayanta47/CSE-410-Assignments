@@ -42,13 +42,22 @@ public:
         this->z = this->z + vect.z * sign * translation_unit;
     }
 
-    Point cross_product(Point *vect)
+    Point crossProduct(Point vect)
     {
         Point temp;
-        temp.x = this->y * vect->z - this->z * vect->y;
-        temp.y = this->z * vect->x - this->x * vect->z;
-        temp.z = this->x * vect->y - this->y * vect->x;
+        temp.x = this->y * vect.z - this->z * vect.y;
+        temp.y = this->z * vect.x - this->x * vect.z;
+        temp.z = this->x * vect.y - this->y * vect.x;
 
+        return temp;
+    }
+
+    Point returnDeepCopy()
+    {
+        Point temp;
+        temp.x = this->x;
+        temp.y = this->y;
+        temp.z = this->z;
         return temp;
     }
 };

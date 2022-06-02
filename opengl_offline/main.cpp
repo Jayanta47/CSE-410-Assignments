@@ -1,29 +1,5 @@
 #include "vector.h"
-//#include<stdio.h>
-//#include<stdlib.h>
-//#include<math.h>
-//
-//#include <windows.h>
-//#include <GL/glut.h>
-//
-//#define pi (2*acos(0.0))
-//#define ANTICLOCKWISE 1
-//#define CLOCKWISE -1
 
-
-
-
-//struct point
-//{
-//	double x,y,z;
-//	point(){}
-//	point(double x, double y, double z)
-//	{
-//	    this->x = x;
-//	    this->y = y;
-//	    this->z = z;
-//	}
-//};
 
 // global variables initialization
 Point pos, U, R, L;
@@ -33,33 +9,12 @@ Point pos, U, R, L;
 // L -> Look vector
 // Notice: U, R, L are all unit vectors
 
+int sq_side, radius_curv;
 
-
-//void add_along_dir(point* p, point dir_vect, int sign = 1)
-//{
-//    p->x = p->x + dir_vect.x * sign * translation_unit;
-//    p->y = p->y + dir_vect.y * sign * translation_unit;
-//    p->z = p->z + dir_vect.z * sign * translation_unit;
-//}
-
-//point cross_product(point a, point b)
-//{
-//    point temp;
-//    temp.x = a.y*b.z - a.z*b.y;
-//    temp.y = a.z*b.x - a.x*b.z;
-//    temp.z = a.x*b.y - a.y*b.x;
-//
-//    return temp;
-//}
-
-//double deg2Rad(double angle)
-//{
-//    return (pi * angle)/180.0;
-//}
 
 void rotate_vector(Point *vec, Point axis, int angle_dir) // + for anticlockwise, - for clockwise
 {
-    Point vec_cross_axis = axis.cross_product(vec);
+    Point vec_cross_axis = axis.crossProduct(vec->returnDeepCopy());
 
     double ang = angle_dir * deg2Rad(rotation_unit);
 
@@ -184,10 +139,10 @@ void drawSquare(double a)
 {
     //glColor3f(1.0,0.0,0.0);
 	glBegin(GL_QUADS);{
-		glVertex3f( a, a,2);
-		glVertex3f( a,-a,2);
-		glVertex3f(-a,-a,2);
-		glVertex3f(-a, a,2);
+		glVertex3f( a, a,0);
+		glVertex3f( a,-a,0);
+		glVertex3f(-a,-a,0);
+		glVertex3f(-a, a,0);
 	}glEnd();
 }
 
@@ -245,11 +200,12 @@ void drawCone(double radius,double height,int segments)
 }
 
 
-void drawSphere(double radius,int slices,int stacks)
+void drawSphere(double radius,int slices,int stacks, int parts = 1, bool lower_sphere = true)
 {
 	Point points[100][100];
 	int i,j;
 	double h,r;
+	double total_angle = (2.0*pi)/parts;
 	//generate points
 	for(i=0;i<=stacks;i++)
 	{
@@ -257,15 +213,17 @@ void drawSphere(double radius,int slices,int stacks)
 		r=radius*cos(((double)i/(double)stacks)*(pi/2));
 		for(j=0;j<=slices;j++)
 		{
-			points[i][j].x=r*cos(((double)j/(double)slices)*2*pi);
-			points[i][j].y=r*sin(((double)j/(double)slices)*2*pi);
+			points[i][j].x=r*cos(((double)j/(double)slices)*total_angle);
+			points[i][j].y=r*sin(((double)j/(double)slices)*total_angle);
 			points[i][j].z=h;
 		}
 	}
 	//draw quads using generated points
 	for(i=0;i<stacks;i++)
 	{
-        glColor3f((double)i/(double)stacks,(double)i/(double)stacks,(double)i/(double)stacks);
+
+        //glColor3f((double)i/(double)stacks,(double)i/(double)stacks,(double)i/(double)stacks);
+        glColor3f(1, 1, 1);
 		for(j=0;j<slices;j++)
 		{
 			glBegin(GL_QUADS);{
@@ -275,20 +233,150 @@ void drawSphere(double radius,int slices,int stacks)
 				glVertex3f(points[i+1][j+1].x,points[i+1][j+1].y,points[i+1][j+1].z);
 				glVertex3f(points[i+1][j].x,points[i+1][j].y,points[i+1][j].z);
                 //lower hemisphere
-                glVertex3f(points[i][j].x,points[i][j].y,-points[i][j].z);
-				glVertex3f(points[i][j+1].x,points[i][j+1].y,-points[i][j+1].z);
-				glVertex3f(points[i+1][j+1].x,points[i+1][j+1].y,-points[i+1][j+1].z);
-				glVertex3f(points[i+1][j].x,points[i+1][j].y,-points[i+1][j].z);
+                if (lower_sphere) {
+                    glVertex3f(points[i][j].x,points[i][j].y,-points[i][j].z);
+                    glVertex3f(points[i][j+1].x,points[i][j+1].y,-points[i][j+1].z);
+                    glVertex3f(points[i+1][j+1].x,points[i+1][j+1].y,-points[i+1][j+1].z);
+                    glVertex3f(points[i+1][j].x,points[i+1][j].y,-points[i+1][j].z);
+                }
+
 			}glEnd();
 		}
 	}
 }
 
+void drawCylinder(double radius, double height, int segments, int parts = 1)
+{
+    Point points[200];
+    int h, r;
+    double total_angle = (2.0*pi)/parts;
+    //generate points
+    for(int i = 0; i <= segments; i++)
+    {
+        points[i].x = radius * cos(((double) i / (double) segments) * total_angle);
+        points[i].y = radius * sin(((double) i / (double) segments) * total_angle);
+    }
+
+    for (int i = 0; i < segments; i++)
+    {
+        glColor3f(1, 1, 0);
+        glBegin(GL_QUADS);
+        {
+            glVertex3f(points[i].x, points[i].y, 0);
+            glVertex3f(points[i].x, points[i].y, height);
+            glVertex3f(points[i + 1].x, points[i + 1].y, height);
+            glVertex3f(points[i + 1].x, points[i + 1].y, 0);
+        }
+        glEnd();
+    }
+}
+
+void drawSphereSegment()
+{
+    // total 8 segments needs to be built
+    // the segment locations are described assuming
+    // camera position at above +z axis and looking
+    // towards x-y plane
+
+    // segment 1: +x, +y, +z
+    glPushMatrix();
+    {
+        glTranslated(sq_side, sq_side, sq_side);
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: -x, +y, +z
+    glPushMatrix();
+    {
+        glTranslated(-sq_side, sq_side, sq_side);
+        glRotated(90, 0,0,1);
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: +x, -y, +z
+    glPushMatrix();
+    {
+        glTranslated(sq_side, -sq_side, sq_side);
+        glRotated(-90, 0,0,1);
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: -x, -y, +z
+    glPushMatrix();
+    {
+        glTranslated(-sq_side, -sq_side, sq_side);
+        glRotated(180, 0,0,1);
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: +x, +y, -z
+    glPushMatrix();
+    {
+        glTranslated(sq_side, sq_side, -sq_side);
+        glRotated(180, 1,1,0);
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: -x, +y, -z
+    glPushMatrix();
+    {
+        glTranslated(-sq_side, sq_side, -sq_side);
+        glRotated(90, 0,0,1);
+        glRotated(180, 1, 1, 0); // mirror to x-y plane
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: +x, -y, -z
+    glPushMatrix();
+    {
+        glTranslated(sq_side, -sq_side, -sq_side);
+        glRotated(-90, 0,0,1);
+        glRotated(180, 1, 1, 0); // mirror to x-y plane
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+
+    // segment 1: -x, -y, -z
+    glPushMatrix();
+    {
+        glTranslated(-sq_side, -sq_side, -sq_side);
+        glRotated(180, 0,0,1);
+        glRotated(180, 1, 1, 0); // mirror to x-y plane
+        drawSphere(radius_curv, 50, 30, 4, false);
+    }
+    glPopMatrix();
+}
+
+void drawCyliderSegment()
+{
+    // total 12 segments needs to be built
+    // each segment refers to an egde
+    // the segment locations are described assuming
+    // camera position at above +z axis and looking
+    // towards x-y plane
+
+    // segment 1:
+    glPushMatrix();
+    {
+
+    }
+    glPopMatrix();
+}
 
 void drawSS()
 {
     glColor3f(1,0,0);
     drawSquare(20);
+
+//    drawSphere(30, 25, 50, 4, false);
+//    drawCylinder(20, 10, 50, 4);
+    drawSphereSegment();
 
     glRotatef(angle,0,0,1);
     glTranslatef(110,0,0);
@@ -489,6 +577,8 @@ void init(){
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
+	sq_side = 10;
+	radius_curv = 10;
 
 	//clear the screen
 	glClearColor(0,0,0,0);
