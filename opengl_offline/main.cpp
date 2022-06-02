@@ -245,7 +245,7 @@ void drawSphere(double radius,int slices,int stacks, int parts = 1, bool lower_s
 	}
 }
 
-void drawCylinder(double radius, double height, int segments, int parts = 1)
+void drawCylinder(double radius, double height, int segments, int parts = 1, bool lower_part = true)
 {
     Point points[200];
     int h, r;
@@ -259,13 +259,20 @@ void drawCylinder(double radius, double height, int segments, int parts = 1)
 
     for (int i = 0; i < segments; i++)
     {
-        glColor3f(1, 1, 0);
+        glColor3f(0, 1, 0);
         glBegin(GL_QUADS);
         {
             glVertex3f(points[i].x, points[i].y, 0);
-            glVertex3f(points[i].x, points[i].y, height);
-            glVertex3f(points[i + 1].x, points[i + 1].y, height);
+            glVertex3f(points[i].x, points[i].y, height/2.0);
+            glVertex3f(points[i + 1].x, points[i + 1].y, height/2.0);
             glVertex3f(points[i + 1].x, points[i + 1].y, 0);
+            if (lower_part)
+            {
+                glVertex3f(points[i].x, points[i].y, 0);
+                glVertex3f(points[i].x, points[i].y, -height/2.0);
+                glVertex3f(points[i + 1].x, points[i + 1].y, -height/2.0);
+                glVertex3f(points[i + 1].x, points[i + 1].y, 0);
+            }
         }
         glEnd();
     }
@@ -356,15 +363,108 @@ void drawSphereSegment()
 void drawCyliderSegment()
 {
     // total 12 segments needs to be built
-    // each segment refers to an egde
+    // each segment refers to an edge
     // the segment locations are described assuming
     // camera position at above +z axis and looking
     // towards x-y plane
 
-    // segment 1:
+    // segment 1: (+,+,+) to (-,+,+)
+    glPushMatrix();
+    {
+        glTranslatef(0, sq_side, sq_side);
+        glRotated(-90, 0, 1, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 2: (+,+,+) to (+,-,+)
+    glPushMatrix();
+    {
+        glTranslatef(sq_side, 0, sq_side);
+        glRotated(90, 1, 0, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 3: (+,-,+) to (-,-,+)
+    glPushMatrix();
+    {
+        glTranslatef(0, -sq_side, sq_side);
+        glRotated(90, 1, 0, 0);
+        glRotated(-90, 0, 1, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 4: (-,+,+) to (-,-,+)
+    glPushMatrix();
+    {
+        glTranslatef(-sq_side, sq_side, 0);
+        glRotated(-90, 1, 0, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 5: (+,+,-) to (-,+,-)
     glPushMatrix();
     {
 
+    }
+    glPopMatrix();
+
+    // segment 6: (+,+,-) to (+,-,-)
+    glPushMatrix();
+    {
+
+    }
+    glPopMatrix();
+
+    // segment 7: (+,-,-) to (-,-,-)
+    glPushMatrix();
+    {
+
+    }
+    glPopMatrix();
+
+    // segment 8: (-,+,-) to (-,-,-)
+    glPushMatrix();
+    {
+
+    }
+    glPopMatrix();
+
+    // segment 9: (+,+,+) to (+,+,-)
+    glPushMatrix();
+    {
+        glTranslatef(sq_side, sq_side, 0);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 10: (-,+,+) to (-,+,-)
+    glPushMatrix();
+    {
+        glTranslatef(-sq_side, sq_side, 0);
+        glRotated(90, 0,0,1);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 11: (+,-,+) to (+,-,-)
+    glPushMatrix();
+    {
+        glTranslatef(sq_side, -sq_side, 0);
+        glRotated(-90, 0,0,1);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    }
+    glPopMatrix();
+
+    // segment 12: (-,-,+) to (-,-,-)
+    glPushMatrix();
+    {
+        glTranslatef(-sq_side, -sq_side, 0);
+        glRotated(180, 0,0,1);
+        drawCylinder(radius_curv, 2*sq_side, 50, 4);
     }
     glPopMatrix();
 }
@@ -375,8 +475,9 @@ void drawSS()
     drawSquare(20);
 
 //    drawSphere(30, 25, 50, 4, false);
-//    drawCylinder(20, 10, 50, 4);
+//    drawCylinder(radius_curv, 2*sq_side, 50, 4);
     drawSphereSegment();
+    drawCyliderSegment();
 
     glRotatef(angle,0,0,1);
     glTranslatef(110,0,0);
