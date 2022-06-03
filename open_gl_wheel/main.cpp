@@ -1,6 +1,11 @@
 #include "vector.h"
 #include <assert.h>
 
+#define WHEEL_AXLE_HEIGHT 4.0
+#define WHEEL_RADIUS 20.0
+#define SLICES 50
+
+
 // global variables initialization
 Point pos, U, R, L;
 // pos indicates the position of the camera
@@ -9,21 +14,24 @@ Point pos, U, R, L;
 // L -> Look vector
 // Notice: U, R, L are all unit vectors
 
-Point wheelCenter;
-Point wheelForward;
+Point wheelCenter; // vector pointing to the center of the wheel
+Point wheelForward; // vector indicating the front direction of the wheel
 
-double wForwardRotateChange = 5;
-double wXaxisAngleChange = 3;
+/// wForwardRotateChange: angular change at each step when wheel moves forward
+double wForwardRotateChange = 5; /// unit: degrees;
 
-double wAxleRotationAngle = 0; // in degrees
+/// wXaxisAngleChange: rotation angle with respect to x-axis when rotating left or right
+double wXaxisAngleChange = 3; /// unit: degrees;
+
+
+/// wAxleRotationAngle: how much rotation of the axle there will be
+/// at a certain point of relocation
+double wAxleRotationAngle = 0; /// unit: degrees
+
+/// wAngleWithXaxis: The current angle with respect to the x-axis at any point of time
 double wAngleWithXaxis = 0;
 
-double wheelAxleHeight = 10;
-double wheelRadius = 20;
-double distance = wheelRadius * deg2Rad(wForwardRotateChange);
-
-int sq_side, radius_curv;
-
+double distChange = WHEEL_RADIUS * deg2Rad(wForwardRotateChange);
 
 void rotate_vector(Point *vec, Point axis, int angle_dir) // angle dir-> + for anticlockwise, - for clockwise
 {
@@ -35,7 +43,6 @@ void rotate_vector(Point *vec, Point axis, int angle_dir) // angle dir-> + for a
     vec->y = vec->y * cos(ang) + vec_cross_axis.y * sin(ang);
     vec->z = vec->z * cos(ang) + vec_cross_axis.z * sin(ang);
 }
-
 
 void move_camera_forward ()
 {
@@ -107,16 +114,16 @@ void tilt_counter_clockwise()
 
 void moveWheelForward()
 {
-    wheelCenter.x += wheelForward.x * distance;
-    wheelCenter.y += wheelForward.y * distance;
+    wheelCenter.x += wheelForward.x * distChange;
+    wheelCenter.y += wheelForward.y * distChange;
     wAxleRotationAngle += wForwardRotateChange;
 
 }
 
 void moveWheelBackward()
 {
-    wheelCenter.x -= wheelForward.x * distance;
-    wheelCenter.y -= wheelForward.y * distance;
+    wheelCenter.x -= wheelForward.x * distChange;
+    wheelCenter.y -= wheelForward.y * distChange;
     wAxleRotationAngle -= wForwardRotateChange;
 }
 
@@ -124,14 +131,14 @@ void rotateWheelLeft()
 {
     wAngleWithXaxis += wXaxisAngleChange;
     Point z_axis(0,0,1);
-    rotate_vector(&wheelForward, z_axis, 1);
+    rotate_vector(&wheelForward, z_axis, ANTICLOCKWISE);
 }
 
 void rotateWheelRight()
 {
     wAngleWithXaxis -= wXaxisAngleChange;
     Point z_axis(0,0,1);
-    rotate_vector(&wheelForward, z_axis, -1);
+    rotate_vector(&wheelForward, z_axis, CLOCKWISE);
 }
 
 void drawAxes()
@@ -140,11 +147,11 @@ void drawAxes()
 	{
 		glColor3f(1.0, 1.0, 1.0);
 		glBegin(GL_LINES);{
-			glVertex3f( 100,0,0);
-			glVertex3f(-100,0,0);
+			glVertex3f( 210,0,0);
+			glVertex3f(-210,0,0);
 
-			glVertex3f(0,-100,0);
-			glVertex3f(0, 100,0);
+			glVertex3f(0,-210,0);
+			glVertex3f(0, 210,0);
 
 			glVertex3f(0,0, 100);
 			glVertex3f(0,0,-100);
@@ -160,38 +167,28 @@ void drawGrid()
 	{
 		glColor3f(0.6, 0.6, 0.6);	//grey
 		glBegin(GL_LINES);{
-			for(i=-8;i<=8;i++){
+			for(i=-20;i<=20;i++){
 
-				if(i==0)
-					continue;	//SKIP the MAIN axes
+//				if(i==0)
+//					continue;	//SKIP the MAIN axes
 
 				//lines parallel to Y-axis
-				glVertex3f(i*10, -90, 0);
-				glVertex3f(i*10,  90, 0);
+				glVertex3f(i*10, -210, 0);
+				glVertex3f(i*10,  210, 0);
 
 				//lines parallel to X-axis
-				glVertex3f(-90, i*10, 0);
-				glVertex3f( 90, i*10, 0);
+				glVertex3f(-210, i*10, 0);
+				glVertex3f( 210, i*10, 0);
 			}
 		}glEnd();
 	}
 }
 
-void drawSquare(double a)
-{
-    glColor3f(1.0,0.0,0.0);
-	glBegin(GL_QUADS);{
-		glVertex3f( a, a,0);
-		glVertex3f( a,-a,0);
-		glVertex3f(-a,-a,0);
-		glVertex3f(-a, a,0);
-	}glEnd();
-}
 
 void drawWheelAxle(double axleBeamHeight, double wheelRadius)
 {
     assert(axleBeamHeight < wheelRadius && axleBeamHeight > 0.0 && wheelRadius > 0.0);
-    glColor3f(0.7,0.7,0.7);
+    glColor3f(1,1,1);
 
     // along x-axis
     glBegin(GL_QUADS);
@@ -212,6 +209,26 @@ void drawWheelAxle(double axleBeamHeight, double wheelRadius)
         glVertex3f(0, -wheelRadius, axleBeamHeight/2.0);
     }
     glEnd();
+
+    // along +x, +y
+    glBegin(GL_QUADS);
+    {
+        glVertex3f(wheelRadius/sqrt(2.0), wheelRadius/sqrt(2.0), axleBeamHeight/2.0);
+        glVertex3f(wheelRadius/sqrt(2.0), wheelRadius/sqrt(2.0), -axleBeamHeight/2.0);
+        glVertex3f(-wheelRadius/sqrt(2.0), -wheelRadius/sqrt(2.0), -axleBeamHeight/2.0);
+        glVertex3f(-wheelRadius/sqrt(2.0), -wheelRadius/sqrt(2.0), axleBeamHeight/2.0);
+    }
+    glEnd();
+
+    // along +x, -y
+    glBegin(GL_QUADS);
+    {
+        glVertex3f(-wheelRadius/sqrt(2.0), wheelRadius/sqrt(2.0), axleBeamHeight/2.0);
+        glVertex3f(-wheelRadius/sqrt(2.0), wheelRadius/sqrt(2.0), -axleBeamHeight/2.0);
+        glVertex3f(wheelRadius/sqrt(2.0), -wheelRadius/sqrt(2.0), -axleBeamHeight/2.0);
+        glVertex3f(wheelRadius/sqrt(2.0), -wheelRadius/sqrt(2.0), axleBeamHeight/2.0);
+    }
+    glEnd();
 }
 
 
@@ -220,7 +237,6 @@ void drawWheelPerimeter(double wheelRadius, double wheelPmWidth, int slices, int
     assert(slices < 100);
     Point points[100];
 
-//    glColor3f(0.7,0.7,0.7);
     double total_angle = (2.0*pi)/parts;
     //generate points
     for(int i=0;i<=slices;i++){
@@ -230,7 +246,10 @@ void drawWheelPerimeter(double wheelRadius, double wheelPmWidth, int slices, int
 
     for (int i=0; i<slices; i++)
     {
-        glColor3f(0.7,0.7,0.7);
+//        glColor3f(0.7,0.5,0.3);
+        glColor3f((double)(slices-i)/(double)slices,
+                  (double)(slices-i)/(double)slices,
+                  (double)(slices-i)/(double)slices);
         glBegin(GL_QUADS); {
             glVertex3f(points[i].x, points[i].y, 0);
             glVertex3f(points[i+1].x, points[i+1].y, 0);
@@ -250,438 +269,22 @@ void drawWheelPerimeter(double wheelRadius, double wheelPmWidth, int slices, int
 }
 
 
-void drawCircle(double radius,int segments)
+
+void drawWheel()
 {
-    int i;
-    Point points[100];
-    glColor3f(0.7,0.7,0.7);
-    //generate points
-    for(i=0;i<=segments;i++)
-    {
-        points[i].x=radius*cos(((double)i/(double)segments)*2*pi);
-        points[i].y=radius*sin(((double)i/(double)segments)*2*pi);
-    }
-    //draw segments using generated points
-    for(i=0;i<segments;i++)
-    {
-        glBegin(GL_LINES);
-        {
-			glVertex3f(points[i].x,points[i].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,0);
-        }
-        glEnd();
-    }
-}
 
-void drawCone(double radius,double height,int segments)
-{
-    int i;
-    double shade;
-    Point points[100];
-    //generate points
-    for(i=0;i<=segments;i++)
-    {
-        points[i].x=radius*cos(((double)i/(double)segments)*2*pi);
-        points[i].y=radius*sin(((double)i/(double)segments)*2*pi);
-    }
-    //draw triangles using generated points
-    for(i=0;i<segments;i++)
-    {
-        //create shading effect
-        if(i<segments/2)shade=2*(double)i/(double)segments;
-        else shade=2*(1.0-(double)i/(double)segments);
-        glColor3f(shade,shade,shade);
-
-        glBegin(GL_TRIANGLES);
-        {
-            glVertex3f(0,0,height);
-			glVertex3f(points[i].x,points[i].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,0);
-        }
-        glEnd();
-    }
-}
-
-
-void drawSphere(double radius,int slices,int stacks, int parts = 1, bool lower_sphere = true)
-{
-	Point points[100][100];
-	int i,j;
-	double h,r;
-	double total_angle = (2.0*pi)/parts;
-	//generate points
-	for(i=0;i<=stacks;i++)
-	{
-		h=radius*sin(((double)i/(double)stacks)*(pi/2));
-		r=radius*cos(((double)i/(double)stacks)*(pi/2));
-		for(j=0;j<=slices;j++)
-		{
-			points[i][j].x=r*cos(((double)j/(double)slices)*total_angle);
-			points[i][j].y=r*sin(((double)j/(double)slices)*total_angle);
-			points[i][j].z=h;
-		}
-	}
-	//draw quads using generated points
-	for(i=0;i<stacks;i++)
-	{
-
-        //glColor3f((double)i/(double)stacks,(double)i/(double)stacks,(double)i/(double)stacks);
-        glColor3f(1, 1, 1);
-		for(j=0;j<slices;j++)
-		{
-			glBegin(GL_QUADS);{
-			    //upper hemisphere
-				glVertex3f(points[i][j].x,points[i][j].y,points[i][j].z);
-				glVertex3f(points[i][j+1].x,points[i][j+1].y,points[i][j+1].z);
-				glVertex3f(points[i+1][j+1].x,points[i+1][j+1].y,points[i+1][j+1].z);
-				glVertex3f(points[i+1][j].x,points[i+1][j].y,points[i+1][j].z);
-                //lower hemisphere
-                if (lower_sphere) {
-                    glVertex3f(points[i][j].x,points[i][j].y,-points[i][j].z);
-                    glVertex3f(points[i][j+1].x,points[i][j+1].y,-points[i][j+1].z);
-                    glVertex3f(points[i+1][j+1].x,points[i+1][j+1].y,-points[i+1][j+1].z);
-                    glVertex3f(points[i+1][j].x,points[i+1][j].y,-points[i+1][j].z);
-                }
-
-			}glEnd();
-		}
-	}
-}
-
-void drawCylinder(double radius, double height, int segments, int parts = 1, bool lower_part = true)
-{
-    Point points[200];
-    double total_angle = (2.0*pi)/parts;
-    //generate points
-    for(int i = 0; i <= segments; i++)
-    {
-        points[i].x = radius * cos(((double) i / (double) segments) * total_angle);
-        points[i].y = radius * sin(((double) i / (double) segments) * total_angle);
-    }
-
-    for (int i = 0; i < segments; i++)
-    {
-        glColor3f(0, 1, 0);
-        glBegin(GL_QUADS);
-        {
-            glVertex3f(points[i].x, points[i].y, 0);
-            glVertex3f(points[i].x, points[i].y, height/2.0);
-            glVertex3f(points[i + 1].x, points[i + 1].y, height/2.0);
-            glVertex3f(points[i + 1].x, points[i + 1].y, 0);
-            if (lower_part)
-            {
-                glVertex3f(points[i].x, points[i].y, 0);
-                glVertex3f(points[i].x, points[i].y, -height/2.0);
-                glVertex3f(points[i + 1].x, points[i + 1].y, -height/2.0);
-                glVertex3f(points[i + 1].x, points[i + 1].y, 0);
-            }
-        }
-        glEnd();
-    }
-}
-
-void drawSphereSegment()
-{
-    // total 8 segments needs to be built
-    // the segment locations are described assuming
-    // camera position at above +z axis and looking
-    // towards x-y plane
-
-    // segment 1: +x, +y, +z
-    glPushMatrix();
-    {
-        glTranslated(sq_side, sq_side, sq_side);
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: -x, +y, +z
-    glPushMatrix();
-    {
-        glTranslated(-sq_side, sq_side, sq_side);
-        glRotated(90, 0,0,1);
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: +x, -y, +z
-    glPushMatrix();
-    {
-        glTranslated(sq_side, -sq_side, sq_side);
-        glRotated(-90, 0,0,1);
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: -x, -y, +z
-    glPushMatrix();
-    {
-        glTranslated(-sq_side, -sq_side, sq_side);
-        glRotated(180, 0,0,1);
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: +x, +y, -z
-    glPushMatrix();
-    {
-        glTranslated(sq_side, sq_side, -sq_side);
-        glRotated(180, 1,1,0);
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: -x, +y, -z
-    glPushMatrix();
-    {
-        glTranslated(-sq_side, sq_side, -sq_side);
-        glRotated(90, 0,0,1);
-        glRotated(180, 1, 1, 0); // mirror to x-y plane
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: +x, -y, -z
-    glPushMatrix();
-    {
-        glTranslated(sq_side, -sq_side, -sq_side);
-        glRotated(-90, 0,0,1);
-        glRotated(180, 1, 1, 0); // mirror to x-y plane
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-
-    // segment 1: -x, -y, -z
-    glPushMatrix();
-    {
-        glTranslated(-sq_side, -sq_side, -sq_side);
-        glRotated(180, 0,0,1);
-        glRotated(180, 1, 1, 0); // mirror to x-y plane
-        drawSphere(radius_curv, 50, 30, 4, false);
-    }
-    glPopMatrix();
-}
-
-void drawCyliderSegment()
-{
-    // total 12 segments needs to be built
-    // each segment refers to an edge
-    // the segment locations are described assuming
-    // camera position at above +z axis and looking
-    // towards x-y plane
-
-    // segment 1: (+,+,+) to (-,+,+)
-    glPushMatrix();
-    {
-        glTranslatef(0, sq_side, sq_side);
-        glRotated(-90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 2: (+,+,+) to (+,-,+)
-    glPushMatrix();
-    {
-        glTranslatef(sq_side, 0, sq_side);
-        glRotated(90, 1, 0, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 3: (+,-,+) to (-,-,+)
-    glPushMatrix();
-    {
-        glTranslatef(0, -sq_side, sq_side);
-        glRotated(90, 1, 0, 0);
-        glRotated(-90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 4: (-,+,+) to (-,-,+)
-    glPushMatrix();
-    {
-        glTranslatef(-sq_side, 0, sq_side);
-        glRotated(90, 0, 0, 1);
-        glRotated(-90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 5: (+,+,-) to (-,+,-)
-    glPushMatrix();
-    {
-        glTranslatef(0, sq_side, -sq_side);
-        glRotated(90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 6: (+,+,-) to (+,-,-)
-    glPushMatrix();
-    {
-        glTranslatef(sq_side, 0, -sq_side);
-        glRotated(-90, 1, 0, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 7: (+,-,-) to (-,-,-)
-    glPushMatrix();
-    {
-        glTranslatef(0, -sq_side, -sq_side);
-        glRotated(-90, 1, 0, 0);
-        glRotated(90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 8: (-,+,-) to (-,-,-)
-    glPushMatrix();
-    {
-        glTranslatef(-sq_side, 0, -sq_side);
-        glRotated(90, 0, 0, 1);
-        glRotated(90, 0, 1, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 9: (+,+,+) to (+,+,-)
-    glPushMatrix();
-    {
-        glTranslatef(sq_side, sq_side, 0);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 10: (-,+,+) to (-,+,-)
-    glPushMatrix();
-    {
-        glTranslatef(-sq_side, sq_side, 0);
-        glRotated(90, 0,0,1);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 11: (+,-,+) to (+,-,-)
-    glPushMatrix();
-    {
-        glTranslatef(sq_side, -sq_side, 0);
-        glRotated(-90, 0,0,1);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-
-    // segment 12: (-,-,+) to (-,-,-)
-    glPushMatrix();
-    {
-        glTranslatef(-sq_side, -sq_side, 0);
-        glRotated(180, 0,0,1);
-        drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    }
-    glPopMatrix();
-}
-
-void drawSquareSideSegment()
-{
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(sq_side+radius_curv, 0, 0);
-        glRotated(90, 0,1,0);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(-sq_side-radius_curv, 0, 0);
-        glRotated(90, 0,1,0);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(0, sq_side+radius_curv, 0);
-        glRotated(90, 1,0,0);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(0,-sq_side-radius_curv, 0);
-        glRotated(90, 1,0,0);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(0,0, sq_side+radius_curv);
-//        glRotated(90, 0,1,0);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-    // segment 1:
-    glPushMatrix();
-    {
-        glTranslated(0,0,-sq_side-radius_curv);
-        drawSquare(sq_side);
-    }
-    glPopMatrix();
-
-}
-
-void drawSS()
-{
-//    glColor3f(1,0,0);
-//    drawSquare(20);
-
-//    drawSphere(30, 25, 50, 4, false);
-//    drawCylinder(radius_curv, 2*sq_side, 50, 4);
     glPushMatrix();
     {
         glTranslatef(wheelCenter.x, wheelCenter.y, wheelCenter.z);
         glRotatef(wAngleWithXaxis, 0, 0, 1);
         glRotatef(wAxleRotationAngle, 0, 1, 0);
         glRotatef(90, 1, 0, 0);
-        drawWheelAxle(wheelAxleHeight, wheelRadius);
+        drawWheelAxle(WHEEL_AXLE_HEIGHT, WHEEL_RADIUS);
 
-        drawWheelPerimeter(wheelRadius, wheelAxleHeight, 50);
+        drawWheelPerimeter(WHEEL_RADIUS, WHEEL_AXLE_HEIGHT+5.0, SLICES);
     }
     glPopMatrix();
 
-//    drawWheelAxle(wheelAxleHeight, wheelRadius);
-
-
-//    glRotatef(angle,0,0,1);
-//    glTranslatef(110,0,0);
-//    glRotatef(2*angle,0,0,1);
-//    glColor3f(0,1,0);
-//    drawSquare(15);
-//
-//    glPushMatrix();
-//    {
-//        glRotatef(angle,0,0,1);
-//        glTranslatef(60,0,0);
-//        glRotatef(2*angle,0,0,1);
-//        glColor3f(0,0,1);
-//        drawSquare(10);
-//    }
-//    glPopMatrix();
-//
-//    glRotatef(3*angle,0,0,1);
-//    glTranslatef(40,0,0);
-//    glRotatef(4*angle,0,0,1);
-//    glColor3f(1,1,0);
-//    drawSquare(5);
 }
 
 void keyboardListener(unsigned char key, int x,int y){
@@ -847,7 +450,7 @@ void display(){
 	drawGrid();
 
 
-    drawSS();
+    drawWheel();
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
@@ -863,14 +466,11 @@ void animate(){
 void init(){
 	//codes for initialization
 	drawgrid=1;
-	drawaxes=1;
+	drawaxes=0;
 	cameraHeight=150.0;
 	cameraAngle=1.0;
-	angle=0;
-//	sq_side = 20;
-//	radius_curv = 20;
 
-    wheelCenter = Point(30,30, wheelRadius);
+    wheelCenter = Point(10,10, WHEEL_RADIUS);
     wheelForward = Point(1, 0, 0);
 
 	//clear the screen
@@ -904,7 +504,7 @@ int main(int argc, char **argv){
 	glutInitWindowPosition(0, 0);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);	//Depth, Double buffer, RGB color
 
-	glutCreateWindow("My OpenGL Program");
+	glutCreateWindow("Wheel Demo");
 
 	init();
 
