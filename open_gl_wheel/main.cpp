@@ -1,6 +1,5 @@
 #include "vector.h"
-
-double sphr2cubeRate = 1.0;
+#include <assert.h>
 
 // global variables initialization
 Point pos, U, R, L;
@@ -9,6 +8,14 @@ Point pos, U, R, L;
 // R -> right indicating vector
 // L -> Look vector
 // Notice: U, R, L are all unit vectors
+
+Point wheelCenter;
+Point wheelForward;
+
+double wRotationAngle = 3; // in degrees
+double wAngle;
+double wheelAxleHeight = 10;
+double wheelRadius = 20;
 
 int sq_side, radius_curv;
 
@@ -23,6 +30,7 @@ void rotate_vector(Point *vec, Point axis, int angle_dir) // + for anticlockwise
     vec->y = vec->y * cos(ang) + vec_cross_axis.y * sin(ang);
     vec->z = vec->z * cos(ang) + vec_cross_axis.z * sin(ang);
 }
+
 
 void move_camera_forward ()
 {
@@ -92,6 +100,25 @@ void tilt_counter_clockwise()
     rotate_vector(&R, L, CLOCKWISE);
 }
 
+void moveWheelForward()
+{
+
+}
+
+void moveWheelBackward()
+{
+
+}
+
+void rotateWheelLeft()
+{
+
+}
+
+void rotateWheelRight()
+{
+
+}
 
 void drawAxes()
 {
@@ -145,6 +172,67 @@ void drawSquare(double a)
 		glVertex3f(-a,-a,0);
 		glVertex3f(-a, a,0);
 	}glEnd();
+}
+
+void drawWheelAxle(double axleBeamHeight, double wheelRadius)
+{
+    assert(axleBeamHeight < wheelRadius && axleBeamHeight > 0.0 && wheelRadius > 0.0);
+    glColor3f(0.7,0.7,0.7);
+
+    // along x-axis
+    glBegin(GL_QUADS);
+    {
+        glVertex3f(wheelRadius, 0, axleBeamHeight/2.0);
+        glVertex3f(wheelRadius, 0, -axleBeamHeight/2.0);
+        glVertex3f(-wheelRadius, 0, -axleBeamHeight/2.0);
+        glVertex3f(-wheelRadius, 0, axleBeamHeight/2.0);
+    }
+    glEnd();
+
+    // along y-axis
+    glBegin(GL_QUADS);
+    {
+        glVertex3f(0, wheelRadius, axleBeamHeight/2.0);
+        glVertex3f(0, wheelRadius, -axleBeamHeight/2.0);
+        glVertex3f(0, -wheelRadius, -axleBeamHeight/2.0);
+        glVertex3f(0, -wheelRadius, axleBeamHeight/2.0);
+    }
+    glEnd();
+}
+
+
+void drawWheelPerimeter(double wheelRadius, double wheelPmWidth, int slices, int parts = 1, bool doubleHeight = true)
+{
+    assert(slices < 100);
+    Point points[100];
+
+//    glColor3f(0.7,0.7,0.7);
+    double total_angle = (2.0*pi)/parts;
+    //generate points
+    for(int i=0;i<=slices;i++){
+        points[i].x=wheelRadius*cos(((double)i/(double)slices) * total_angle);
+        points[i].y=wheelRadius*sin(((double)i/(double)slices) * total_angle);
+    }
+
+    for (int i=0; i<slices; i++)
+    {
+        glColor3f(0.7,0.7,0.7);
+        glBegin(GL_QUADS); {
+            glVertex3f(points[i].x, points[i].y, 0);
+            glVertex3f(points[i+1].x, points[i+1].y, 0);
+            glVertex3f(points[i+1].x, points[i+1].y, wheelPmWidth/2);
+            glVertex3f(points[i].x, points[i].y, wheelPmWidth/2);
+
+            if (doubleHeight)
+            {
+                glVertex3f(points[i].x, points[i].y, 0);
+                glVertex3f(points[i+1].x, points[i+1].y, 0);
+                glVertex3f(points[i+1].x, points[i+1].y, -wheelPmWidth/2);
+                glVertex3f(points[i].x, points[i].y, -wheelPmWidth/2);
+            }
+        } glEnd();
+    }
+
 }
 
 
@@ -249,7 +337,6 @@ void drawSphere(double radius,int slices,int stacks, int parts = 1, bool lower_s
 void drawCylinder(double radius, double height, int segments, int parts = 1, bool lower_part = true)
 {
     Point points[200];
-    int h, r;
     double total_angle = (2.0*pi)/parts;
     //generate points
     for(int i = 0; i <= segments; i++)
@@ -545,9 +632,11 @@ void drawSS()
 
 //    drawSphere(30, 25, 50, 4, false);
 //    drawCylinder(radius_curv, 2*sq_side, 50, 4);
-    drawSphereSegment();
-    drawCyliderSegment();
-    drawSquareSideSegment();
+
+    drawGrid();
+    drawAxes();
+    drawWheelAxle(wheelAxleHeight, wheelRadius);
+    drawWheelPerimeter(wheelRadius, wheelAxleHeight, 50);
 
 //    glRotatef(angle,0,0,1);
 //    glTranslatef(110,0,0);
@@ -572,7 +661,6 @@ void drawSS()
 //    drawSquare(5);
 }
 
-
 void keyboardListener(unsigned char key, int x,int y){
 //	``1 - rotate/look left
 //    2 - rotate/look right
@@ -583,7 +671,23 @@ void keyboardListener(unsigned char key, int x,int y){
 
 	switch(key){
 
-		case '1':
+		case 'w':
+            moveWheelForward();
+			break;
+
+        case 's':
+            moveWheelBackward();
+			break;
+
+        case 'a':
+            rotateWheelLeft();
+			break;
+
+        case 'd':
+            rotateWheelRight();
+			break;
+
+        case '1':
             rotate_left();
 			break;
 
@@ -606,32 +710,6 @@ void keyboardListener(unsigned char key, int x,int y){
         case '6':
             tilt_counter_clockwise();
 			break;
-
-        case 't':
-            if (translation_unit < 30)
-            { translation_unit++; }
-            break;
-
-        case 'r':
-            if (rotation_unit < 30.0) rotation_unit++;
-            break;
-
-        case 's':
-            if (sphr2cubeRate < 5.0) sphr2cubeRate++;
-            break;
-
-        case 'T':
-            if (translation_unit > 0)
-            { translation_unit--; }
-            break;
-
-        case 'R':
-            if (rotation_unit > 0.0) rotation_unit--;
-            break;
-
-        case 'S':
-            if (sphr2cubeRate > 0.0) sphr2cubeRate--;
-            break;
 
 		default:
 			break;
@@ -670,13 +748,11 @@ void specialKeyListener(int key, int x,int y){
 			break;
 
 		case GLUT_KEY_HOME:
-		    sq_side = max(0.0, sq_side - sphr2cubeRate);
-		    radius_curv = min(MAX_THRESH,radius_curv + sphr2cubeRate);
+
 			break;
 
 		case GLUT_KEY_END:
-            sq_side = min(MAX_THRESH, sq_side + sphr2cubeRate);
-		    radius_curv = max(0.0, radius_curv - sphr2cubeRate);
+
 			break;
 
 		default:
@@ -764,7 +840,7 @@ void animate(){
 
 void init(){
 	//codes for initialization
-	drawgrid=0;
+	drawgrid=1;
 	drawaxes=1;
 	cameraHeight=150.0;
 	cameraAngle=1.0;
