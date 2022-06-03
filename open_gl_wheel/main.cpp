@@ -12,19 +12,24 @@ Point pos, U, R, L;
 Point wheelCenter;
 Point wheelForward;
 
-double wAxleRotationAngle = 3; // in degrees
+double wForwardRotateChange = 5;
+double wXaxisAngleChange = 3;
+
+double wAxleRotationAngle = 0; // in degrees
 double wAngleWithXaxis = 0;
+
 double wheelAxleHeight = 10;
 double wheelRadius = 20;
+double distance = wheelRadius * deg2Rad(wForwardRotateChange);
 
 int sq_side, radius_curv;
 
 
-void rotate_vector(Point *vec, Point axis, int angle_dir) // + for anticlockwise, - for clockwise
+void rotate_vector(Point *vec, Point axis, int angle_dir) // angle dir-> + for anticlockwise, - for clockwise
 {
     Point vec_cross_axis = axis.crossProduct(vec->returnDeepCopy());
 
-    double ang = angle_dir * deg2Rad(rotation_unit);
+    double ang = angle_dir * deg2Rad(wXaxisAngleChange);
 
     vec->x = vec->x * cos(ang) + vec_cross_axis.x * sin(ang);
     vec->y = vec->y * cos(ang) + vec_cross_axis.y * sin(ang);
@@ -102,22 +107,31 @@ void tilt_counter_clockwise()
 
 void moveWheelForward()
 {
+    wheelCenter.x += wheelForward.x * distance;
+    wheelCenter.y += wheelForward.y * distance;
+    wAxleRotationAngle += wForwardRotateChange;
 
 }
 
 void moveWheelBackward()
 {
-
+    wheelCenter.x -= wheelForward.x * distance;
+    wheelCenter.y -= wheelForward.y * distance;
+    wAxleRotationAngle -= wForwardRotateChange;
 }
 
 void rotateWheelLeft()
 {
-
+    wAngleWithXaxis += wXaxisAngleChange;
+    Point z_axis(0,0,1);
+    rotate_vector(&wheelForward, z_axis, 1);
 }
 
 void rotateWheelRight()
 {
-
+    wAngleWithXaxis -= wXaxisAngleChange;
+    Point z_axis(0,0,1);
+    rotate_vector(&wheelForward, z_axis, -1);
 }
 
 void drawAxes()
@@ -635,7 +649,7 @@ void drawSS()
     glPushMatrix();
     {
         glTranslatef(wheelCenter.x, wheelCenter.y, wheelCenter.z);
-        glRotatef(wAngleWithXaxis, 1, 0, 0);
+        glRotatef(wAngleWithXaxis, 0, 0, 1);
         glRotatef(wAxleRotationAngle, 0, 1, 0);
         glRotatef(90, 1, 0, 0);
         drawWheelAxle(wheelAxleHeight, wheelRadius);
