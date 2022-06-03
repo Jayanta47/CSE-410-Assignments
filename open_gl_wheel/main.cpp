@@ -12,8 +12,8 @@ Point pos, U, R, L;
 Point wheelCenter;
 Point wheelForward;
 
-double wRotationAngle = 3; // in degrees
-double wAngle;
+double wAxleRotationAngle = 3; // in degrees
+double wAngleWithXaxis = 0;
 double wheelAxleHeight = 10;
 double wheelRadius = 20;
 
@@ -632,11 +632,20 @@ void drawSS()
 
 //    drawSphere(30, 25, 50, 4, false);
 //    drawCylinder(radius_curv, 2*sq_side, 50, 4);
+    glPushMatrix();
+    {
+        glTranslatef(wheelCenter.x, wheelCenter.y, wheelCenter.z);
+        glRotatef(wAngleWithXaxis, 1, 0, 0);
+        glRotatef(wAxleRotationAngle, 0, 1, 0);
+        glRotatef(90, 1, 0, 0);
+        drawWheelAxle(wheelAxleHeight, wheelRadius);
 
-    drawGrid();
-    drawAxes();
-    drawWheelAxle(wheelAxleHeight, wheelRadius);
-    drawWheelPerimeter(wheelRadius, wheelAxleHeight, 50);
+        drawWheelPerimeter(wheelRadius, wheelAxleHeight, 50);
+    }
+    glPopMatrix();
+
+//    drawWheelAxle(wheelAxleHeight, wheelRadius);
+
 
 //    glRotatef(angle,0,0,1);
 //    glTranslatef(110,0,0);
@@ -783,7 +792,6 @@ void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of th
 }
 
 
-
 void display(){
 
 	//clear the display
@@ -845,8 +853,11 @@ void init(){
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
-	sq_side = 20;
-	radius_curv = 20;
+//	sq_side = 20;
+//	radius_curv = 20;
+
+    wheelCenter = Point(30,30, wheelRadius);
+    wheelForward = Point(1, 0, 0);
 
 	//clear the screen
 	glClearColor(0,0,0,0);
@@ -867,7 +878,7 @@ void init(){
 	//near distance
 	//far distance
 
-    pos = Point(100, 100, 0);
+    pos = Point(100, 100, 50);
     U = Point(0, 0, 1);
     R = Point(-1/sqrt(2.0), 1/sqrt(2.0), 0);
     L = Point(-1/sqrt(2.0), -1/sqrt(2.0), 0);
