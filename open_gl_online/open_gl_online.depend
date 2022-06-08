@@ -1,9 +1,8 @@
 # depslib dependency file v1.0
-1654279071 source:d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\open_gl_wheel\main.cpp
+1654679909 source:d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\open_gl_online\main.cpp
 	"vector.h"
-	<assert.h>
 
-1654210472 d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\open_gl_wheel\vector.h
+1654210472 d:\cse course related\cse level - 4 term - 1\cse-410 - computer graphics sessional\cse-410-assignments\open_gl_online\vector.h
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -237,7 +236,4 @@
 1301093164 d:\codeblocks portable2\mingw\include\gl\glu.h
 	<stddef.h>
 	<GL/gl.h>
-
-1340992370 d:\codeblocks portable2\mingw\include\assert.h
-	<_mingw.h>
 
