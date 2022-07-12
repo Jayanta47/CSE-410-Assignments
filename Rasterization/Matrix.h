@@ -26,6 +26,13 @@ public:
 
 TransformMatrix::TransformMatrix()
 {
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            matrix[i][j] = 0.0;
+        }
+    }
 }
 
 void TransformMatrix::setVal(int row, int col, double newVal)
@@ -72,8 +79,7 @@ void createScalingMtx(TransformMatrix &mat, Triplet &S)
     mat.setVal(2, 2, S.z);
 }
 
-
-void createRotationMtx(double angle, Point a) 
+void createRotationMtx(TransformMatrix &mat, Point a, double angle)
 {
     a.normalize();
     Point i_vect(1.0, 0.0, 0.0);
@@ -84,8 +90,17 @@ void createRotationMtx(double angle, Point a)
     Point c2 = RodriguesFormula(j_vect, a, angle);
     Point c3 = RodriguesFormula(k_vect, a, angle);
 
+    mat.setVal(0, 0, c1.x);
+    mat.setVal(1, 0, c1.y);
+    mat.setVal(2, 0, c1.z);
     
-} 
-
+    mat.setVal(0, 1, c2.x);
+    mat.setVal(1, 1, c2.y);
+    mat.setVal(2, 1, c2.z);
+    
+    mat.setVal(0, 2, c3.x);
+    mat.setVal(1, 2, c3.y);
+    mat.setVal(2, 2, c3.z);
+}
 
 #endif
