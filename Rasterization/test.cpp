@@ -38,14 +38,38 @@ int main() {
 
     passed ? cout<<"Passed"<<endl:cout<<"Failed"<<endl;
 
+    stack<TransformMatrix> stk;
+
     cout<<"Translation Matrix"<<endl;
     Triplet T(2,4,6);
     createTranslationMtx(mat, T);
     printMatrix(mat);
 
+    stk.push(mat);
+
     cout<<"Scaling Matrix"<<endl;
     createIdentityMtx(mat);
-    Triplet S(4,6, 2.4);
+    Triplet S(4,6, 2);
     createScalingMtx(mat, S);
     printMatrix(mat);
+
+    TransformMatrix mat2 = mat;
+
+    mat = stk.top();
+    cout<<endl;
+    printMatrix(mat);
+
+    mat.multiplyMatrix(mat2);
+
+    cout<<"Multiply matrix test"<<endl;
+    printMatrix(mat);
+    cout<<endl;
+    mat = stk.top();
+    printMatrix(mat);
+
+    cout<<"Multiply point Test"<<endl;
+    Point A(1,2,3);
+    Point B = mat.multiplyPoint(A);
+    cout<<B.x<<" "<<B.y<<" "<<B.z<<" "<<B.w<<endl;
+
 }

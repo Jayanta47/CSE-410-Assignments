@@ -4,11 +4,16 @@
 #include "Vector.h"
 #include <assert.h>
 
-#define forn(i,n) for(i=0;i<n;i++)
+#define forn(i, n) for (i = 0; i < n; i++)
 
 struct Triplet
 {
     double x, y, z;
+    Triplet()
+    {
+        x = y = z = 0.0;
+    }
+
     Triplet(double x_, double y_, double z_)
     {
         x = x_;
@@ -57,6 +62,7 @@ public:
     double getVal(int, int);
     int getSize();
     void multiplyMatrix(TransformMatrix mat);
+    Point multiplyPoint(Point A);
     TransformMatrix getCopy();
     ~TransformMatrix();
 };
@@ -115,6 +121,36 @@ void TransformMatrix::multiplyMatrix(TransformMatrix mat)
     }
 }
 
+Point TransformMatrix::multiplyPoint(Point A)
+{
+    Point temp;
+    double arr[4];
+    arr[0] = A.x;
+    arr[1] = A.y;
+    arr[2] = A.z;
+    arr[3] = A.w;
+
+    double pointArr[4];
+
+    int i, k;
+    forn(i, size)
+    {
+        double sum = 0.0;
+        forn(k, size)
+        {
+            sum += matrix[i][k] * arr[k];
+        }
+        pointArr[i] = sum;
+    }
+
+    temp.x = pointArr[0] / pointArr[3];
+    temp.y = pointArr[1] / pointArr[3];
+    temp.z = pointArr[2] / pointArr[3];
+    temp.w = 1.0;
+
+    return temp;
+}
+
 TransformMatrix TransformMatrix::getCopy()
 {
     TransformMatrix temp;
@@ -137,10 +173,14 @@ void createIdentityMtx(TransformMatrix &mat)
 {
     int n = mat.getSize();
     int i, j;
-    forn(i, n) {
-        forn(j, n) {
-            if (i == j) mat.setVal(i,j,1.0);
-            else mat.setVal(i,j,0.0);
+    forn(i, n)
+    {
+        forn(j, n)
+        {
+            if (i == j)
+                mat.setVal(i, j, 1.0);
+            else
+                mat.setVal(i, j, 0.0);
         }
     }
 }
@@ -162,6 +202,9 @@ void createScalingMtx(TransformMatrix &mat, Triplet &S)
 void createRotationMtx(TransformMatrix &mat, Point a, double angle)
 {
     a.normalize();
+
+    // std::cout<<a.x<<" "<<a.y<<" "<<a.z<<std::endl;
+
     Point i_vect(1.0, 0.0, 0.0);
     Point j_vect(0.0, 1.0, 0.0);
     Point k_vect(0.0, 0.0, 1.0);
@@ -234,6 +277,36 @@ void createProjectionMatrix(TransformMatrix &mat, perspectiveParams prsP)
     mat.setVal(2, 3, -(2.0 * prsP.far * prsP.near) / (prsP.far - prsP.near));
     mat.setVal(3, 2, -1.0);
     mat.setVal(3, 3, 0.0);
+}
+
+Point multiplyPoint(TransformMatrix mat, Point A)
+{
+    Point temp;
+    double arr[4];
+    arr[0] = A.x;
+    arr[1] = A.y;
+    arr[2] = A.z;
+    arr[3] = A.w;
+
+    double pointArr[4];
+
+    int i, k, size = mat.getSize();
+    forn(i, size)
+    {
+        double sum = 0.0;
+        forn(k, size)
+        {
+            sum += mat.getVal(i, k) * arr[k];
+        }
+        pointArr[i] = sum;
+    }
+
+    temp.x = pointArr[0] / pointArr[3];
+    temp.y = pointArr[1] / pointArr[3];
+    temp.z = pointArr[2] / pointArr[3];
+    temp.w = 1.0;
+
+    return temp;
 }
 
 #endif

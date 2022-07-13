@@ -4,14 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cmath>
 
-#define pi (2 * acos(0.0))
+#define pi (2.0 * acos(0.0))
 
 int addition_scale = 1;
 
 double deg2Rad(double angle)
 {
-    return (pi * angle) / 180.0;
+    return ((pi * angle) / 180.0);
 }
 
 class Point
@@ -61,7 +62,9 @@ public:
 
     double dotProduct(Point vect)
     {
-        return (this->x * vect.x) + (this->y * vect.y) + (this->z * vect.z);
+        
+        double sum = (this->x * vect.x) + (this->y * vect.y) + (this->z * vect.z);
+        return sum;
     }
 
     void normalize()
@@ -89,11 +92,12 @@ Point RodriguesFormula(Point x, Point a, double angle)
 
     double cosTheta = cos(deg2Rad(angle));
     double sinTheta = sin(deg2Rad(angle));
-    x.scalarMult(cosTheta);
+
 
     double scalarMlt_a = (1.0 - cosTheta) * a.dotProduct(x);
     Point a_cross_x = a.crossProduct(x);
 
+    x.scalarMult(cosTheta);
     a_cross_x.scalarMult(sinTheta);
     a.scalarMult(scalarMlt_a);
 
