@@ -5,8 +5,11 @@
 #include "Vector.h"
 #include "Matrix.h"
 #include "FileWrite.h"
+#include "Triangle.h"
 
 using namespace std;
+
+#define println(s) std::cout<<s<<std::endl;
 
 gluLookParams glP;
 perspectiveParams prsP;
@@ -187,4 +190,26 @@ int main(int argc, char **argv)
     stage1.closeFile();
     stage2.closeFile();
     stage3.closeFile();
+
+    in.open("./test_cases/"+ dirname +"/config.txt");
+
+    int Screen_Width, Screen_Height;
+    double X_leftLimit, X_rightLimit, Y_bottomLimit, Y_topLimit;
+    double Z_frontLimit, Z_rearLimit;
+
+    in>>Screen_Width>>Screen_Height;
+    in>>X_leftLimit;
+    X_rightLimit = -X_leftLimit;
+    in>>Y_bottomLimit;
+    Y_topLimit = -Y_bottomLimit;
+    in>>Z_frontLimit>>Z_rearLimit;
+
+    // println(Screen_Width<<" "<<Screen_Height);
+    // println(X_leftLimit<<" "<<X_rightLimit<<" "<<Y_bottomLimit<<" "<<Y_topLimit);
+    // println(Z_frontLimit<<" "<<Z_rearLimit);
+
+
+    in.close();
+
+
 }
