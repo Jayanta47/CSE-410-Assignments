@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <ctime>
 #include <cstdio>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -6,13 +7,16 @@
 #include "Matrix.h"
 #include "FileWrite.h"
 #include "Triangle.h"
+#include "Containers.h"
+#include "ClipUtil.h"
 
 using namespace std;
 
-#define println(s) std::cout<<s<<std::endl;
+#define println(s) std::cout << s << std::endl;
 
 gluLookParams glP;
 perspectiveParams prsP;
+configParams cfP;
 
 void printMatrix(TransformMatrix mat)
 {
@@ -34,15 +38,17 @@ int main(int argc, char **argv)
     ifstream in;
     ofstream out;
 
+    srand(time(0));
+
     std::string dirname = "1";
-    std::string path = "./output/"+dirname;
+    std::string path = "./output/" + dirname;
     mkdir(path.c_str(), 0777);
 
-    in.open("./test_cases/"+ dirname +"/scene.txt");
+    in.open("./test_cases/" + dirname + "/scene.txt");
 
-    FileWriter stage1("stage1.txt", "./output/"+dirname+"/");
-    FileWriter stage2("stage2.txt", "./output/"+dirname+"/");
-    FileWriter stage3("stage3.txt", "./output/"+dirname+"/");
+    FileWriter stage1("stage1.txt", "./output/" + dirname + "/");
+    FileWriter stage2("stage2.txt", "./output/" + dirname + "/");
+    FileWriter stage3("stage3.txt", "./output/" + dirname + "/");
 
     stage1.openFile();
     stage2.openFile();
@@ -63,7 +69,7 @@ int main(int argc, char **argv)
     // glP.print();
     // prsP.print();
 
-    // generate view matrix 
+    // generate view matrix
     TransformMatrix viewMatrix;
     createIdentityMtx(viewMatrix);
     createViewMatrix(viewMatrix, glP);
@@ -78,6 +84,8 @@ int main(int argc, char **argv)
 
     createIdentityMtx(topMatrix);
     matrixStack.push(topMatrix);
+
+    vector<Triangle> triangle_vect;
 
     string command;
 
@@ -122,6 +130,10 @@ int main(int argc, char **argv)
             stage3.writePointToFile(P2);
             stage3.writePointToFile(P3);
             stage3.writeTextToFile("");
+
+            Triangle t(P1, P2, P3);
+
+            triangle_vect.push_back(t);
         }
         else if (command == "translate")
         {
@@ -191,25 +203,24 @@ int main(int argc, char **argv)
     stage2.closeFile();
     stage3.closeFile();
 
-    in.open("./test_cases/"+ dirname +"/config.txt");
+    // Read data
 
-    int Screen_Width, Screen_Height;
-    double X_leftLimit, X_rightLimit, Y_bottomLimit, Y_topLimit;
-    double Z_frontLimit, Z_rearLimit;
+    in.open("./test_cases/" + dirname + "/config.txt");
 
-    in>>Screen_Width>>Screen_Height;
-    in>>X_leftLimit;
-    X_rightLimit = -X_leftLimit;
-    in>>Y_bottomLimit;
-    Y_topLimit = -Y_bottomLimit;
-    in>>Z_frontLimit>>Z_rearLimit;
+    in >> cfP.Screen_Width >> cfP.Screen_Height;
+    in >> cfP.X_leftLimit;
 
-    // println(Screen_Width<<" "<<Screen_Height);
-    // println(X_leftLimit<<" "<<X_rightLimit<<" "<<Y_bottomLimit<<" "<<Y_topLimit);
-    // println(Z_frontLimit<<" "<<Z_rearLimit);
+    cfP.X_rightLimit = -cfP.X_leftLimit;
 
+    in >> cfP.Y_bottomLimit;
+
+    cfP.Y_topLimit = -cfP.Y_bottomLimit;
+
+    in >> cfP.Z_frontLimit >> cfP.Z_rearLimit;
+
+    // cout<<cfP.Z_frontLimit<<" "<<cfP.Z_rearLimit<<endl;
 
     in.close();
 
-
+    generateZBufferVal(triangle_vect, cfP, dirname);
 }

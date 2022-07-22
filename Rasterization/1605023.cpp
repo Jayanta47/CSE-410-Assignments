@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
     ofstream output;
 
     /* setting test case directory name */
-    string testCaseDir = "1";
+    string testCaseDir = "3";
 
     /* preparing input for extracting values from scene.txt */
     input.open("./test_cases/"+testCaseDir+"/scene.txt");
@@ -445,278 +445,293 @@ int main(int argc, char** argv) {
     }
 
     /* stage2: view transformation */
-    // Transformation viewTransformation;
-    // viewTransformation.generateViewMatrix(Point(eyeX, eyeY, eyeZ), Point(lookX, lookY, lookZ), Point(upX, upY, upZ));
+    Transformation viewTransformation;
+    viewTransformation.generateViewMatrix(Point(eyeX, eyeY, eyeZ), Point(lookX, lookY, lookZ), Point(upX, upY, upZ));
 
-    // input.open("./test-cases/"+testCaseDir+"/stage1.txt");
-    // if(!input.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    input.open("./test_cases/"+testCaseDir+"/stage1.txt");
+    if(!input.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // output.open("./test-cases/"+testCaseDir+"/stage2.txt");
-    // if(!output.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    output.open("./test_cases/"+testCaseDir+"/stage2.txt");
+    if(!output.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // for(int i=0; i<triangleCounter; i++) {
-    //     Point p1, p2, p3;
+    for(int i=0; i<triangleCounter; i++) {
+        Point p1, p2, p3;
 
-    //     input >> p1;
-    //     input >> p2;
-    //     input >> p3;
+        input >> p1;
+        input >> p2;
+        input >> p3;
 
-    //     p1 = viewTransformation*p1;
-    //     p1.scale();
-    //     p2 = viewTransformation*p2;
-    //     p2.scale();
-    //     p3 = viewTransformation*p3;
-    //     p3.scale();
+        p1 = viewTransformation*p1;
+        p1.scale();
+        p2 = viewTransformation*p2;
+        p2.scale();
+        p3 = viewTransformation*p3;
+        p3.scale();
 
-    //     output << p1 << endl;
-    //     output << p2 << endl;
-    //     output << p3 << endl;
-    //     output << endl;
-    // }
-    // input.close();
-    // output.close();
+        output << p1 << endl;
+        output << p2 << endl;
+        output << p3 << endl;
+        output << endl;
+    }
+    input.close();
+    output.close();
 
-    // /* stage3: projection transformation */
-    // Transformation projectionTransformation;
-    // projectionTransformation.generateProjectionMatrix(fovY, aspectRatio, near, far);
+    /* stage3: projection transformation */
+    Transformation projectionTransformation;
+    projectionTransformation.generateProjectionMatrix(fovY, aspectRatio, near, far);
 
-    // input.open("./test-cases/"+testCaseDir+"/stage2.txt");
-    // if(!input.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    input.open("./test_cases/"+testCaseDir+"/stage2.txt");
+    if(!input.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // output.open("./test-cases/"+testCaseDir+"/stage3.txt");
-    // if(!output.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    output.open("./test_cases/"+testCaseDir+"/stage3.txt");
+    if(!output.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // for(int i=0; i<triangleCounter; i++) {
-    //     Point p1, p2, p3;
+    for(int i=0; i<triangleCounter; i++) {
+        Point p1, p2, p3;
 
-    //     input >> p1;
-    //     input >> p2;
-    //     input >> p3;
+        input >> p1;
+        input >> p2;
+        input >> p3;
 
-    //     p1 = projectionTransformation*p1;
-    //     p1.scale();
-    //     p2 = projectionTransformation*p2;
-    //     p2.scale();
-    //     p3 = projectionTransformation*p3;
-    //     p3.scale();
+        p1 = projectionTransformation*p1;
+        p1.scale();
+        p2 = projectionTransformation*p2;
+        p2.scale();
+        p3 = projectionTransformation*p3;
+        p3.scale();
 
-    //     output << p1 << endl;
-    //     output << p2 << endl;
-    //     output << p3 << endl;
-    //     output << endl;
-    // }
-    // input.close();
-    // output.close();
+        output << p1 << endl;
+        output << p2 << endl;
+        output << p3 << endl;
+        output << endl;
+    }
+    input.close();
+    output.close();
 
-    // /* stage4: clipping & scan conversion using z-buffer algorithm */
+    /* stage4: clipping & scan conversion using z-buffer algorithm */
 
-    // /* reading values from config.txt */
-    // input.open("./test-cases/"+testCaseDir+"/config.txt");
-    // if(!input.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    /* reading values from config.txt */
+    input.open("./test_cases/"+testCaseDir+"/config.txt");
+    if(!input.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // int screenWidth, screenHeight;
-    // double leftLimitX, rightLimitX, bottomLimitY, topLimitY, frontLimitZ, rearLimitZ;
+    int screenWidth, screenHeight;
+    double leftLimitX, rightLimitX, bottomLimitY, topLimitY, frontLimitZ, rearLimitZ;
 
-    // input >> screenWidth >> screenHeight;
-    // input >> leftLimitX;
-    // input >> bottomLimitY;
-    // input >> frontLimitZ >> rearLimitZ;
+    input >> screenWidth >> screenHeight;
+    input >> leftLimitX;
+    input >> bottomLimitY;
+    input >> frontLimitZ >> rearLimitZ;
 
-    // input.close();
+    input.close();
 
-    // rightLimitX = -leftLimitX;
-    // topLimitY = -bottomLimitY;
+    rightLimitX = -leftLimitX;
+    topLimitY = -bottomLimitY;
 
-    // /* reading values from stage3.txt */
-    // input.open("./test-cases/"+testCaseDir+"/stage3.txt");
-    // if(!input.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    /* reading values from stage3.txt */
+    input.open("./test_cases/"+testCaseDir+"/stage3.txt");
+    if(!input.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // Triangle triangles[triangleCounter];
-    // srand(time(0));
+    Triangle triangles[triangleCounter];
+    srand(time(0));
 
-    // for(int i=0; i<triangleCounter; i++) {
-    //     input >> triangles[i].corners[0];
-    //     input >> triangles[i].corners[1];
-    //     input >> triangles[i].corners[2];
+    for(int i=0; i<triangleCounter; i++) {
+        input >> triangles[i].corners[0];
+        input >> triangles[i].corners[1];
+        input >> triangles[i].corners[2];
 
-    //     triangles[i].rgb.redValue = rand()%256;
-    //     triangles[i].rgb.greenValue = rand()%256;
-    //     triangles[i].rgb.blueValue = rand()%256;
-    // }
-    // input.close();
+        triangles[i].rgb.redValue = rand()%256;
+        triangles[i].rgb.greenValue = rand()%256;
+        triangles[i].rgb.blueValue = rand()%256;
+    }
+    input.close();
 
-    // /* initializing z-buffer & frame buffer */
-    // double dx, dy, topY, bottomY, leftX, rightX;
+    /* initializing z-buffer & frame buffer */
+    double dx, dy, topY, bottomY, leftX, rightX;
 
-    // dx = (rightLimitX - leftLimitX)/screenWidth;
-    // dy = (topLimitY - bottomLimitY)/screenHeight;
-    // topY = topLimitY - dy/2.0;
-    // bottomY = bottomLimitY + dy/2.0;
-    // leftX = leftLimitX + dx/2.0;
-    // rightX = rightLimitX - dx/2.0;
+    dx = (rightLimitX - leftLimitX)/screenWidth;
+    dy = (topLimitY - bottomLimitY)/screenHeight;
+    topY = topLimitY - dy/2.0;
+    bottomY = bottomLimitY + dy/2.0;
+    leftX = leftLimitX + dx/2.0;
+    rightX = rightLimitX - dx/2.0;
 
-    // /*
-    //     How do I declare a 2d array in c++ using new?
-    //     Link: https://stackoverflow.com/questions/936687/how-do-i-declare-a-2d-array-in-c-using-new/
-    // */
+    /*
+        How do I declare a 2d array in c++ using new?
+        Link: https://stackoverflow.com/questions/936687/how-do-i-declare-a-2d-array-in-c-using-new/
+    */
 
-    // double** zBuffer = new double*[screenHeight];
-    // for(int i=0; i<screenHeight; i++) {
-    //     zBuffer[i] = new double[screenWidth];
-    // }
+    double** zBuffer = new double*[screenHeight];
+    for(int i=0; i<screenHeight; i++) {
+        zBuffer[i] = new double[screenWidth];
+    }
 
-    // for(int row=0; row<screenHeight; row++) {
-    //     for(int column=0; column<screenWidth; column++) {
-    //         zBuffer[row][column] = rearLimitZ;
-    //     }
-    // }
+    for(int row=0; row<screenHeight; row++) {
+        for(int column=0; column<screenWidth; column++) {
+            zBuffer[row][column] = rearLimitZ;
+        }
+    }
 
-    // Color** frameBuffer = new Color*[screenHeight];
-    // for(int i=0; i<screenHeight; i++) {
-    //     frameBuffer[i] = new Color[screenWidth];
-    // }
+    Color** frameBuffer = new Color*[screenHeight];
+    for(int i=0; i<screenHeight; i++) {
+        frameBuffer[i] = new Color[screenWidth];
+    }
 
-    // for(int row=0; row<screenHeight; row++) {
-    //     for(int column=0; column<screenWidth; column++) {
-    //         frameBuffer[row][column].redValue = 0;
-    //         frameBuffer[row][column].greenValue = 0;
-    //         frameBuffer[row][column].blueValue = 0;
-    //     }
-    // }
+    for(int row=0; row<screenHeight; row++) {
+        for(int column=0; column<screenWidth; column++) {
+            frameBuffer[row][column].redValue = 0;
+            frameBuffer[row][column].greenValue = 0;
+            frameBuffer[row][column].blueValue = 0;
+        }
+    }
 
-    // /* applying procedure */
-    // for(int i=0, topScanline, bottomScanline; i<triangleCounter; i++) {
-    //     /* finding topScanline & bottomScanline after necessary clipping */
-    //     double maxY = max(triangles[i].corners[0].getY(), max(triangles[i].corners[1].getY(), triangles[i].corners[2].getY()));
-    //     double minY = min(triangles[i].corners[0].getY(), min(triangles[i].corners[1].getY(), triangles[i].corners[2].getY()));
+    /* applying procedure */
+    for(int i=0, topScanline, bottomScanline; i<triangleCounter; i++) {
+        /* finding topScanline & bottomScanline after necessary clipping */
+        double maxY = max(triangles[i].corners[0].getY(), max(triangles[i].corners[1].getY(), triangles[i].corners[2].getY()));
+        double minY = min(triangles[i].corners[0].getY(), min(triangles[i].corners[1].getY(), triangles[i].corners[2].getY()));
 
-    //     if(maxY >= topY) {
-    //         topScanline = 0;
-    //     } else {
-    //         topScanline = (int) round((topY - maxY)/dy);
-    //     }
-    //     if(minY <= bottomY) {
-    //         bottomScanline = screenHeight - 1;
-    //     } else {
-    //         bottomScanline = screenHeight - (1 + ((int) round((minY - bottomY)/dy)));
-    //     }
+        if(maxY >= topY) {
+            topScanline = 0;
+        } else {
+            topScanline = (int) round((topY - maxY)/dy);
+        }
+        if(minY <= bottomY) {
+            bottomScanline = screenHeight - 1;
+        } else {
+            bottomScanline = screenHeight - (1 + ((int) round((minY - bottomY)/dy)));
+        }
 
-    //     /* scanning from topScanline to bottomScanline (inclusive) */
-    //     for(int row=topScanline, leftIntersectingColumn, rightIntersectingColumn; row<=bottomScanline; row++) {
-    //         /* defining three intersecting points on triangle's three sides */
-    //         double ys = topY - row*dy;
+        /* scanning from topScanline to bottomScanline (inclusive) */
+        for(int row=topScanline, leftIntersectingColumn, rightIntersectingColumn; row<=bottomScanline; row++) {
+            /* defining three intersecting points on triangle's three sides */
+            double ys = topY - row*dy;
 
-    //         Point intersectingPoints[3];
-    //         intersectingPoints[0] = Point(INF, ys, 0, 1);
-    //         intersectingPoints[1] = Point(INF, ys, 1, 2);
-    //         intersectingPoints[2] = Point(INF, ys, 2, 0);
+            Point intersectingPoints[3];
+            intersectingPoints[0] = Point(INF, ys, 0, 1);
+            intersectingPoints[1] = Point(INF, ys, 1, 2);
+            intersectingPoints[2] = Point(INF, ys, 2, 0);
 
-    //         /* determining intersecting points' x value (if any) */
-    //         for(int j=0; j<3; j++) {
-    //             Point p1 = triangles[i].corners[(int) intersectingPoints[j].getZ()];
-    //             Point p2 = triangles[i].corners[(int) intersectingPoints[j].getW()];
+            /* determining intersecting points' x value (if any) */
+            for(int j=0; j<3; j++) {
+                Point p1 = triangles[i].corners[(int) intersectingPoints[j].getZ()];
+                Point p2 = triangles[i].corners[(int) intersectingPoints[j].getW()];
 
-    //             if(p1.getY() != p2.getY()) {
-    //                 intersectingPoints[j].setX(p1.getX() + (ys - p1.getY())*(p1.getX() - p2.getX())/(p1.getY() - p2.getY()));
-    //             }
-    //         }
+                if(p1.getY() != p2.getY()) {
+                    intersectingPoints[j].setX(p1.getX() + (ys - p1.getY())*(p1.getX() - p2.getX())/(p1.getY() - p2.getY()));
+                }
+            }
 
-    //         /* filtering out all invalid points (if any) */
-    //         for(int j=0; j<3; j++) {
-    //             Point p1 = triangles[i].corners[(int) intersectingPoints[j].getZ()];
-    //             Point p2 = triangles[i].corners[(int) intersectingPoints[j].getW()];
+            /* filtering out all invalid points (if any) */
+            int i = 0;
+            for(int j=0; j<3; j++) {
+                Point p1 = triangles[i].corners[(int) intersectingPoints[j].getZ()];
+                Point p2 = triangles[i].corners[(int) intersectingPoints[j].getW()];
 
-    //             if(intersectingPoints[j].getX() != INF) {
-    //                 if(intersectingPoints[j].getX()>max(p1.getX(), p2.getX()) || intersectingPoints[j].getX()<min(p1.getX(), p2.getX()) || intersectingPoints[j].getY()>max(p1.getY(), p2.getY()) || intersectingPoints[j].getY()<min(p1.getY(), p2.getY())) {
-    //                     intersectingPoints[j].setX(INF);
-    //                 }
-    //             }
-    //         }
+                if(intersectingPoints[j].getX() != INF) {
+                    if(intersectingPoints[j].getX()>max(p1.getX(), p2.getX()) || intersectingPoints[j].getX()<min(p1.getX(), p2.getX()) || intersectingPoints[j].getY()>max(p1.getY(), p2.getY()) || intersectingPoints[j].getY()<min(p1.getY(), p2.getY())) {
+                        intersectingPoints[j].setX(INF);
+                        i++;
+                    }
+                }
+            }
 
-    //         /* finding out leftIntersecting & rightIntersecting points */
-    //         int maxIndex, minIndex;
-    //         maxIndex = minIndex = -1;
+            if (i>=3) cout<<i<<endl;
 
-    //         double maxX, minX;
+            /* finding out leftIntersecting & rightIntersecting points */
+            int maxIndex, minIndex;
+            maxIndex = minIndex = -1;
 
-    //         for(int j=0; j<3; j++) {
-    //             if(maxIndex==-1 && minIndex==-1) {
-    //                 if(intersectingPoints[j].getX() != INF) {
-    //                     maxIndex = minIndex = j;
-    //                     maxX = minX = intersectingPoints[j].getX();
-    //                 }
-    //             } else {
-    //                 if(intersectingPoints[j].getX() != INF) {
-    //                     if(intersectingPoints[j].getX() < minX) {
-    //                         minIndex = j;
-    //                         minX = intersectingPoints[j].getX();
-    //                     }
-    //                     if(intersectingPoints[j].getX() > maxX) {
-    //                         maxIndex = j;
-    //                         maxX = intersectingPoints[j].getX();
-    //                     }
-    //                 }
-    //             }
-    //         }
+            double maxX, minX;
 
-    //         /* finding leftIntersectingColumn & rightIntersectingColumn after necessary clipping */
-    //         if(intersectingPoints[minIndex].getX() <= leftX) {
-    //             leftIntersectingColumn = 0;
-    //         } else {
-    //             leftIntersectingColumn = (int) round((intersectingPoints[minIndex].getX() - leftX)/dx);
-    //         }
-    //         if(intersectingPoints[maxIndex].getX() >= rightX) {
-    //             rightIntersectingColumn = screenWidth - 1;
-    //         } else {
-    //             rightIntersectingColumn = screenWidth - (1 + ((int) round((rightX - intersectingPoints[maxIndex].getX())/dx)));
-    //         }
+            for(int j=0; j<3; j++) {
+                if(maxIndex==-1 && minIndex==-1) {
+                    if(intersectingPoints[j].getX() != INF) {
+                        maxIndex = minIndex = j;
+                        maxX = minX = intersectingPoints[j].getX();
+                    }
+                } else {
+                    if(intersectingPoints[j].getX() != INF) {
+                        if(intersectingPoints[j].getX() < minX) {
+                            minIndex = j;
+                            minX = intersectingPoints[j].getX();
+                        }
+                        if(intersectingPoints[j].getX() > maxX) {
+                            maxIndex = j;
+                            maxX = intersectingPoints[j].getX();
+                        }
+                    }
+                }
+            }
 
-    //         /* determining za & zb values */
-    //         Point p1 = triangles[i].corners[(int) intersectingPoints[minIndex].getZ()];
-    //         Point p2 = triangles[i].corners[(int) intersectingPoints[minIndex].getW()];
+            
 
-    //         double za = p1.getZ() + (intersectingPoints[minIndex].getY() - p1.getY())*(p2.getZ() - p1.getZ())/(p2.getY() - p1.getY());
+            /* finding leftIntersectingColumn & rightIntersectingColumn after necessary clipping */
+            if(intersectingPoints[minIndex].getX() <= leftX) {
+                leftIntersectingColumn = 0;
+            } else {
+                leftIntersectingColumn = (int) round((intersectingPoints[minIndex].getX() - leftX)/dx);
+            }
+            if(intersectingPoints[maxIndex].getX() >= rightX) {
+                rightIntersectingColumn = screenWidth - 1;
+            } else {
+                rightIntersectingColumn = screenWidth - (1 + ((int) round((rightX - intersectingPoints[maxIndex].getX())/dx)));
+            }
 
-    //         p1 = triangles[i].corners[(int) intersectingPoints[maxIndex].getZ()];
-    //         p2 = triangles[i].corners[(int) intersectingPoints[maxIndex].getW()];
 
-    //         double zb = p1.getZ() + (intersectingPoints[maxIndex].getY() - p1.getY())*(p2.getZ() - p1.getZ())/(p2.getY() - p1.getY());
+            if(maxIndex==-1 || minIndex==-1) {
+                cout<<maxIndex<<" "<<minIndex<<endl;
+                cout<<intersectingPoints[minIndex].getX()<<endl;
+                cout<<intersectingPoints[maxIndex].getX()<<endl;
+                cout<<screenWidth<<"->"<<leftIntersectingColumn<<" "<<rightIntersectingColumn<<endl;
+            }
+                
 
-    //         /* scanning from leftIntersectingColumn to rightIntersectingColumn (inclusive) */
-    //         double zp;
-    //         double constantTerm = dx*(zb - za)/(intersectingPoints[maxIndex].getX() - intersectingPoints[minIndex].getX());
+            /* determining za & zb values */
+            Point p1 = triangles[i].corners[(int) intersectingPoints[minIndex].getZ()];
+            Point p2 = triangles[i].corners[(int) intersectingPoints[minIndex].getW()];
 
-    //         for(int column=leftIntersectingColumn; column<=rightIntersectingColumn; column++) {
-    //             /* calculating z value */
-    //             if(column == leftIntersectingColumn) {
-    //                 zp = za + ((leftX + leftIntersectingColumn*dx) - intersectingPoints[minIndex].getX())*(zb - za)/(intersectingPoints[maxIndex].getX()- intersectingPoints[minIndex].getX());
-    //             } else {
-    //                 zp = zp + constantTerm;
-    //             }
+            double za = p1.getZ() + (intersectingPoints[minIndex].getY() - p1.getY())*(p2.getZ() - p1.getZ())/(p2.getY() - p1.getY());
 
-    //             /* comparing computed z value with current value in zBuffer[row][column] & frontLimitZ and updating zBuffer[row][column] & frameBuffer[row][column] if necessary */
-    //             if(zp>frontLimitZ && zp<zBuffer[row][column]) {
-    //                 zBuffer[row][column] = zp;
+            p1 = triangles[i].corners[(int) intersectingPoints[maxIndex].getZ()];
+            p2 = triangles[i].corners[(int) intersectingPoints[maxIndex].getW()];
 
-    //                 frameBuffer[row][column].redValue = triangles[i].rgb.redValue;
-    //                 frameBuffer[row][column].greenValue = triangles[i].rgb.greenValue;
-    //                 frameBuffer[row][column].blueValue = triangles[i].rgb.blueValue;
-    //             }
-    //         }
-    //     }
-    // }
+            double zb = p1.getZ() + (intersectingPoints[maxIndex].getY() - p1.getY())*(p2.getZ() - p1.getZ())/(p2.getY() - p1.getY());
+
+            /* scanning from leftIntersectingColumn to rightIntersectingColumn (inclusive) */
+            double zp;
+            double constantTerm = dx*(zb - za)/(intersectingPoints[maxIndex].getX() - intersectingPoints[minIndex].getX());
+
+            for(int column=leftIntersectingColumn; column<=rightIntersectingColumn; column++) {
+                /* calculating z value */
+                if(column == leftIntersectingColumn) {
+                    zp = za + ((leftX + leftIntersectingColumn*dx) - intersectingPoints[minIndex].getX())*(zb - za)/(intersectingPoints[maxIndex].getX()- intersectingPoints[minIndex].getX());
+                } else {
+                    zp = zp + constantTerm;
+                }
+
+                /* comparing computed z value with current value in zBuffer[row][column] & frontLimitZ and updating zBuffer[row][column] & frameBuffer[row][column] if necessary */
+                if(zp>frontLimitZ && zp<zBuffer[row][column]) {
+                    zBuffer[row][column] = zp;
+
+                    frameBuffer[row][column].redValue = triangles[i].rgb.redValue;
+                    frameBuffer[row][column].greenValue = triangles[i].rgb.greenValue;
+                    frameBuffer[row][column].blueValue = triangles[i].rgb.blueValue;
+                }
+            }
+        }
+    }
 
     // /* saving outputs */
     // bitmap_image bitmapImage(screenWidth, screenHeight);
@@ -743,16 +758,16 @@ int main(int argc, char** argv) {
     // }
     // output.close();
 
-    // /* freeing memory */
-    // for(int i=0; i<screenHeight; i++) {
-    //     delete[] zBuffer[i];
-    // }
-    // delete[] zBuffer;
+    /* freeing memory */
+    for(int i=0; i<screenHeight; i++) {
+        delete[] zBuffer[i];
+    }
+    delete[] zBuffer;
 
-    // for(int i=0; i<screenHeight; i++) {
-    //     delete[] frameBuffer[i];
-    // }
-    // delete[] frameBuffer;
+    for(int i=0; i<screenHeight; i++) {
+        delete[] frameBuffer[i];
+    }
+    delete[] frameBuffer;
 
     return 0;
 }

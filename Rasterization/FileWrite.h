@@ -24,6 +24,7 @@ public:
     bool writePointToFile(Point A);
     bool writeTextToFile(std::string s);
     void closeFile();
+    bool writeDoubleToFile(double x);
     ~FileWriter();
 };
 
@@ -69,6 +70,17 @@ bool FileWriter::writeTextToFile(std::string s)
     if (out.is_open())
     {
         out << std::fixed <<std::setprecision(7)<<s<<std::endl;
+        return true;
+    }
+
+    return false;
+}
+
+bool FileWriter::writeDoubleToFile(double x)
+{
+    if (out.is_open())
+    {
+        out << std::fixed <<std::setprecision(6)<<x<<'\t'<<std::endl;
         return true;
     }
 
