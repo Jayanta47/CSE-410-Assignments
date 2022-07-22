@@ -13,7 +13,7 @@
     https://drive.google.com/file/d/14eOfsMpwIuh8G_Wy6BSjNX6VXFRA9eSM/view?usp=sharing
 */
 
-
+#include "bitmap_image.hpp"
 using namespace std;
 
 #define PI 2.0*acos(0.0)
@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
     ofstream output;
 
     /* setting test case directory name */
-    string testCaseDir = "3";
+    string testCaseDir = "1";
 
     /* preparing input for extracting values from scene.txt */
     input.open("./test_cases/"+testCaseDir+"/scene.txt");
@@ -613,10 +613,15 @@ int main(int argc, char** argv) {
             bottomScanline = screenHeight - (1 + ((int) round((minY - bottomY)/dy)));
         }
 
+        // cout<<topScanline<<" bottom:"<<bottomScanline<<endl;
+        // cout<<"bottomy: "<<dy<<endl;
+
         /* scanning from topScanline to bottomScanline (inclusive) */
         for(int row=topScanline, leftIntersectingColumn, rightIntersectingColumn; row<=bottomScanline; row++) {
             /* defining three intersecting points on triangle's three sides */
             double ys = topY - row*dy;
+
+            // cout<<ys<<endl;
 
             Point intersectingPoints[3];
             intersectingPoints[0] = Point(INF, ys, 0, 1);
@@ -647,7 +652,7 @@ int main(int argc, char** argv) {
                 }
             }
 
-            if (i>=3) cout<<i<<endl;
+            // if (i>=3) cout<<i<<endl;
 
             /* finding out leftIntersecting & rightIntersecting points */
             int maxIndex, minIndex;
@@ -690,12 +695,12 @@ int main(int argc, char** argv) {
             }
 
 
-            if(maxIndex==-1 || minIndex==-1) {
-                cout<<maxIndex<<" "<<minIndex<<endl;
-                cout<<intersectingPoints[minIndex].getX()<<endl;
-                cout<<intersectingPoints[maxIndex].getX()<<endl;
-                cout<<screenWidth<<"->"<<leftIntersectingColumn<<" "<<rightIntersectingColumn<<endl;
-            }
+            // if(maxIndex==-1 || minIndex==-1) {
+            //     cout<<maxIndex<<" "<<minIndex<<endl;
+            //     cout<<intersectingPoints[minIndex].getX()<<endl;
+            //     cout<<intersectingPoints[maxIndex].getX()<<endl;
+            //     cout<<screenWidth<<"->"<<leftIntersectingColumn<<" "<<rightIntersectingColumn<<endl;
+            // }
                 
 
             /* determining za & zb values */
@@ -734,29 +739,29 @@ int main(int argc, char** argv) {
     }
 
     // /* saving outputs */
-    // bitmap_image bitmapImage(screenWidth, screenHeight);
+    bitmap_image bitmapImage(screenWidth, screenHeight);
 
-    // for(int row=0; row<screenHeight; row++) {
-    //     for(int column=0; column<screenWidth; column++) {
-    //         bitmapImage.set_pixel(column, row, frameBuffer[row][column].redValue, frameBuffer[row][column].greenValue, frameBuffer[row][column].blueValue);
-    //     }
-    // }
-    // bitmapImage.save_image("./test-cases/"+testCaseDir+"/out.bmp");
+    for(int row=0; row<screenHeight; row++) {
+        for(int column=0; column<screenWidth; column++) {
+            bitmapImage.set_pixel(column, row, frameBuffer[row][column].redValue, frameBuffer[row][column].greenValue, frameBuffer[row][column].blueValue);
+        }
+    }
+    bitmapImage.save_image("./test-cases2/"+testCaseDir+"/out.bmp");
 
-    // output.open("./test-cases/"+testCaseDir+"/z-buffer.txt");
-    // if(!output.is_open()) {
-    //     exit(EXIT_FAILURE);
-    // }
+    output.open("./test-cases/"+testCaseDir+"/z_buffer.txt");
+    if(!output.is_open()) {
+        exit(EXIT_FAILURE);
+    }
 
-    // for(int row=0; row<screenHeight; row++) {
-    //     for(int column=0; column<screenWidth; column++) {
-    //         if(zBuffer[row][column] < rearLimitZ) {
-    //             output << zBuffer[row][column] << '\t';
-    //         }
-    //     }
-    //     output << endl;
-    // }
-    // output.close();
+    for(int row=0; row<screenHeight; row++) {
+        for(int column=0; column<screenWidth; column++) {
+            if(zBuffer[row][column] < rearLimitZ) {
+                output << zBuffer[row][column] << '\t';
+            }
+        }
+        output << endl;
+    }
+    output.close();
 
     /* freeing memory */
     for(int i=0; i<screenHeight; i++) {

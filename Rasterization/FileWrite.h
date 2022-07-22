@@ -80,7 +80,7 @@ bool FileWriter::writeDoubleToFile(double x)
 {
     if (out.is_open())
     {
-        out << std::fixed <<std::setprecision(6)<<x<<'\t'<<std::endl;
+        out << std::fixed <<std::setprecision(6)<<x<<'\t';
         return true;
     }
 

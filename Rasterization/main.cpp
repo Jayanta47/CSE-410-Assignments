@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
     srand(time(0));
 
-    std::string dirname = "1";
+    std::string dirname = "4";
     std::string path = "./output/" + dirname;
     mkdir(path.c_str(), 0777);
 
