@@ -29,7 +29,7 @@ void printMatrix(TransformMatrix mat)
             // printf("%.3lf ", mat.getVal(i,j));
             cout << std::fixed << setprecision(7) << mat.getVal(i, j) << " ";
         }
-        printf("\n");
+        cout << endl;
     }
 }
 
@@ -66,9 +66,6 @@ int main(int argc, char **argv)
 
     in >> prsP.fovY >> prsP.aspectRatio >> prsP.near >> prsP.far;
 
-    // glP.print();
-    // prsP.print();
-
     // generate view matrix
     TransformMatrix viewMatrix;
     createIdentityMtx(viewMatrix);
@@ -92,8 +89,7 @@ int main(int argc, char **argv)
     while (true)
     {
         in >> command;
-        // cout<<command<<endl;
-
+        
         if (command == "triangle")
         {
             Point P1, P2, P3;
@@ -195,6 +191,8 @@ int main(int argc, char **argv)
         else
         {
             // invalid
+            cout<<"Invalid Command Found...Exiting"<<endl;
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -223,4 +221,6 @@ int main(int argc, char **argv)
     in.close();
 
     generateZBufferVal(triangle_vect, cfP, dirname);
+
+    return 0;
 }

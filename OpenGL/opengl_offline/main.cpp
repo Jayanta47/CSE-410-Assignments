@@ -1,4 +1,6 @@
-#include "vector.h"
+#include "Vector.h"
+
+using namespace std;
 
 double sphr2cubeRate = 1.0;
 

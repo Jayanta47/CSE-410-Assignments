@@ -55,26 +55,10 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
         frame_buffer[i] = new Triplet[cfP.Screen_Width];
     }
 
-    // int j;
-    // forn(i, cfP.Screen_Height)
-    // {
-    //     forn(j, cfP.Screen_Width)
-    //     {
-    //         if (frame_buffer[i][j].x != 0.0 ||
-    //         frame_buffer[i][j].y != 0.0 ||
-    //         frame_buffer[i][j].z != 0.0)
-    //         {
-    //             cout<<"mara khaisi"<<endl;
-    //         }
-    //     }
-
-    // }
-
     for (Triangle triangle : tv)
     {
         pair<double, double> p = triangle.MinMaxPoint('Y');
         double minY = p.first, maxY = p.second;
-        // cout<<minY<<" maxY:"<<maxY<<endl; //done and checked
 
         int topScanline, bottomScanline;
 
@@ -85,8 +69,6 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
         bottomScanline = cfP.Screen_Height - 1;
 
         bottomScanline -= (minY <= Bottom_Y) ? 0 : (int)round((minY - Bottom_Y) / dy);
-
-        // cout<<topScanline<<" bottom:"<<bottomScanline<<endl; // done and tested
 
         for (int scanLine = topScanline; scanLine <= bottomScanline; scanLine++)
         {
@@ -103,16 +85,12 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
                 if (P1.y != P2.y)
                 {
                     double X = extrapolateXfromY(P1.x, P2.x, P1.y, P2.y, ys);
-                    if (X <= max(P1.x, P2.x) && X >= min(P1.x, P2.x)
-                        // && ys <= max(P1.y, P2.y) && ys >= min(P1.y, P2.y)
-                    )
+                    if (X <= max(P1.x, P2.x) && X >= min(P1.x, P2.x))
                     {
                         endPoints.push_back({X, pointIdx});
                     }
-                        
                 }
             }
-
 
             for (auto points : endPoints)
             {
@@ -134,28 +112,20 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
                         maxIndex = points.second;
                     }
                 }
-                
             }
-            // cout<<setprecision(7)<< X_Max<<" "<<X_Min<<endl; // done and tested
-            // cout<<maxIndex<<" "<<minIndex<<endl; // done and tested
 
-            // cout<<Left_X<< " "<<Right_X<<endl; // done and tested
-
-            int leftIntersectingCol= 0;
-            int rightIntersectingCol=cfP.Screen_Width -1;
-            
+            int leftIntersectingCol = 0;
+            int rightIntersectingCol = cfP.Screen_Width - 1;
 
             if (X_Min > Left_X)
             {
                 leftIntersectingCol = (int)round((X_Min - Left_X) / dx);
             }
 
-
             if (X_Max < Right_X)
             {
-                rightIntersectingCol = cfP.Screen_Width - 1 -((int)round((Right_X - X_Max)/dx));
+                rightIntersectingCol = cfP.Screen_Width - 1 - ((int)round((Right_X - X_Max) / dx));
             }
-
 
             Point P1 = triangle.getVertices(minIndex);
             Point P2 = triangle.getVertices((minIndex + 1) % 3);
@@ -210,8 +180,8 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
 
     if (!ZBufferFile.openFile())
     {
-        cout << "Could not open z buffer file" << endl;
-        exit(1);
+        // cout << "Could not open z buffer file" << endl;
+        exit(EXIT_FAILURE);
     }
 
     for (int row = 0; row < cfP.Screen_Height; row++)
@@ -228,15 +198,19 @@ void generateZBufferVal(vector<Triangle> &tv, configParams &cfP, std::string dir
 
     ZBufferFile.closeFile();
 
-    for(int i=0; i<cfP.Screen_Height; i++) {
+    for (int i = 0; i < cfP.Screen_Height; i++)
+    {
         delete[] Z_buffer[i];
     }
     delete[] Z_buffer;
 
-    for(int i=0; i<cfP.Screen_Height; i++) {
+    for (int i = 0; i < cfP.Screen_Height; i++)
+    {
         delete[] frame_buffer[i];
     }
     delete[] frame_buffer;
+
+    tv.clear();
 }
 
 #endif
