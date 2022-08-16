@@ -93,6 +93,7 @@ protected:
     Color color;
     ReflectionCoeff rfco;
     int shine;
+    std::string type;
 
 public:
     Object(/* args */);
@@ -126,6 +127,13 @@ public:
         this->shine = shine;
     }
 
+    std::string get_type()
+    {
+        return this->type;
+    }
+
+    void 
+
     virtual void draw();
     virtual double intersect(Ray, Color &, int);
     ~Object();
@@ -158,6 +166,7 @@ Sphere::Sphere(/* args */)
 {
     length = 0.0;
     segments = stacks = 0;
+    this->type = "Sphere";
 }
 
 Sphere::Sphere(Point center, double radius, int segments, int stacks)
@@ -166,6 +175,7 @@ Sphere::Sphere(Point center, double radius, int segments, int stacks)
     this->segments = segments;
     this->stacks = stacks;
     this->reference_point = center;
+    this->type = "Sphere";
 }
 
 Sphere::~Sphere()
@@ -197,6 +207,7 @@ public:
 
 Triangle::Triangle(/* args */)
 {
+    this->type = "Triangle";
 }
 
 Triangle::Triangle(Point a, Point b, Point c)
@@ -204,6 +215,7 @@ Triangle::Triangle(Point a, Point b, Point c)
     this->reference_point = a;
     this->reference_point2 = b;
     this->reference_point3 = c;
+    this->type = "Triangle";
 }
 
 void Triangle::draw()
@@ -227,6 +239,11 @@ private:
 
 public:
     PointLight(/* args */);
+    PointLight(Point p, Color c)
+    {
+        this->light_pos = p;
+        this->color = c;
+    }
     ~PointLight();
 };
 
@@ -259,7 +276,7 @@ SpotLight::~SpotLight()
 {
 }
 
-class Floor : Object
+class Floor : public Object
 {
 private:
     /* data */

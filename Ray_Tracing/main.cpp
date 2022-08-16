@@ -13,6 +13,7 @@ Point pos, U, R, L;
 
 int imagePixelDimension = 0;
 int objectsCount = 0;
+int lightsCount = 0;
 
 void drawAxes()
 {
@@ -257,7 +258,7 @@ void loadData() {
     string objectShape;
     bool bInvalidObjectShapeFound = false;
 
-    Object* object = NULL;
+    Object object;
 
     for(int i=0; i<objectsCount; i++) {
         input >> objectShape;
@@ -269,7 +270,8 @@ void loadData() {
             input >> center.x>>center.y>>center.z;
             input >> radius;
 
-            object = new Sphere(center, radius, 72, 24);
+            Sphere s(center, radius, 72, 24);
+            object = s;
         } else if(objectShape.compare("triangle") == 0) {
             Point a, b, c;
 
@@ -277,7 +279,8 @@ void loadData() {
             input >> b.x>>b.y>>b.z;
             input >> c.x>>c.y>>c.z;
 
-            object = new Triangle(a, b, c);
+            Triangle t(a, b, c);
+            object = t;
         } 
         // else if(objectShape.compare("general") == 0) {
         //     GeneralQuadricSurfaceCoefficient coefficient;
@@ -300,50 +303,49 @@ void loadData() {
         }
 
         Color color;
-        ReflectionCoeff reflectionCoefficient;
+        ReflectionCoeff refco;
         int shininess;
 
-        input >> color;
-        input >> reflectionCoefficient;
+        input >> color.red >> color.green>> color.blue;
+        input >> refco.ambientCoeff >> refco.diffuseCoeff >> refco.specularCoeff>> refco.recursiveCoeff;
         input >> shininess;
 
-        object->setColor(color);
-        object->setReflectionCoefficient(reflectionCoefficient);
-        object->setShininess(shininess);
+        object.setColor(color);
+        object.setReflectionCoefficient(refco);
+        object.setShininess(shininess);
 
         objects.push_back(object);
     }
-    object = NULL;
+    // object = NULL;
 
-    if(bInvalidObjectShapeFound) {
-        clearObjects();
-        input.close();
-        exit(EXIT_FAILURE);
-    }
+    // if(bInvalidObjectShapeFound) {
+    //     clearObjects();
+    //     input.close();
+    //     exit(EXIT_FAILURE);
+    // }
 
     /* extracting light sources information from input file */
     input >> lightsCount;
 
     for(int i=0; i<lightsCount; i++) {
-        Vector position;
+        Point position;
         Color color;
 
-        input >> position;
-        input >> color;
+        input >> position.x>>position.y>>position.z;
+        input >> color.red>>color.green>>color.blue;
 
-        lights.push_back(Light(position, color, 1.0, 12, 4));
+        pointLights.push_back(PointLight(position, color));
     }
     input.close();
 
     /* creating a floor object and pushing it to objects vector */
-    object = new Floor(1000.0, 20.0, Color());  // color = black
-
-    object->setColor(Color(1.0, 1.0, 1.0));  // color = white
-    object->setReflectionCoefficient(ReflectionCoeff(0.25, 0.25, 0.25, 0.25));
-    object->setShininess(15);
+    Floor f(1000.0, 20.0);  // color = black
+    object = f;
+    object.setColor(Color(1.0, 1.0, 1.0));  // color = white
+    object.setReflectionCoefficient(ReflectionCoeff(0.25, 0.25, 0.25, 0.25));
+    object.setShininess(15);
 
     objects.push_back(object);
-    object = NULL;
 }
 
 int main(int argc, char **argv){
@@ -370,106 +372,3 @@ int main(int argc, char **argv){
 	return 0;
 }
 
-
-// void loadData() {
-//     ifstream input;
-
-//     /* preparing input for extracting values from input file */
-//     input.open("D:\\Academic 4-1\\CSE410 (Computer Graphics sessional)\\offline-3\\offline3-src\\inputs\\scene.txt");
-//     if(!input.is_open()) {
-//         cout << "input.is_open(): failed to open input file" << endl;
-//         exit(EXIT_FAILURE);
-//     }
-
-//     /* extracting recursion level & image pixel dimension from input file */
-//     input >> recursionLevel >> imagePixelDimension;
-
-//     /* extracting objects information from input file */
-//     input >> objectsCount;
-
-//     string objectShape;
-//     bool bInvalidObjectShapeFound = false;
-
-//     Object* object = NULL;
-
-//     for(int i=0; i<objectsCount; i++) {
-//         input >> objectShape;
-
-//         if(objectShape.compare("sphere") == 0) {
-//             Vector center;
-//             double radius;
-
-//             input >> center;
-//             input >> radius;
-
-//             object = new Sphere(center, radius, 72, 24);
-//         } else if(objectShape.compare("triangle") == 0) {
-//             Vector a, b, c;
-
-//             input >> a;
-//             input >> b;
-//             input >> c;
-
-//             object = new Triangle(a, b, c);
-//         } else if(objectShape.compare("general") == 0) {
-//             GeneralQuadricSurfaceCoefficient coefficient;
-//             Vector cubeReferencePoint;
-//             double length, width, height;
-
-//             input >> coefficient;
-//             input >> cubeReferencePoint;
-//             input >> length >> width >> height;
-
-//             object = new GeneralQuadricSurface(coefficient, cubeReferencePoint, length, width, height);
-//         } else {
-//             cout << objectShape << ": invalid object shape found" << endl;
-//             bInvalidObjectShapeFound = true;
-//             break;
-//         }
-
-//         Color color;
-//         ReflectionCoefficient reflectionCoefficient;
-//         int shininess;
-
-//         input >> color;
-//         input >> reflectionCoefficient;
-//         input >> shininess;
-
-//         object->setColor(color);
-//         object->setReflectionCoefficient(reflectionCoefficient);
-//         object->setShininess(shininess);
-
-//         objects.push_back(object);
-//     }
-//     object = NULL;
-
-//     if(bInvalidObjectShapeFound) {
-//         clearObjects();
-//         input.close();
-//         exit(EXIT_FAILURE);
-//     }
-
-//     /* extracting light sources information from input file */
-//     input >> lightsCount;
-
-//     for(int i=0; i<lightsCount; i++) {
-//         Vector position;
-//         Color color;
-
-//         input >> position;
-//         input >> color;
-
-//         lights.push_back(Light(position, color, 1.0, 12, 4));
-//     }
-//     input.close();
-
-//     /* creating a floor object and pushing it to objects vector */
-//     object = new Floor(1000.0, 20.0, Color());  // color = black
-
-//     object->setColor(Color(1.0, 1.0, 1.0));  // color = white
-//     object->setReflectionCoefficient(ReflectionCoefficient(0.25, 0.25, 0.25, 0.25));
-//     object->setShininess(15);
-
-//     objects.push_back(object);
-//     object = NULL;
-// }
