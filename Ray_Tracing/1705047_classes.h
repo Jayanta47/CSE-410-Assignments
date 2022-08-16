@@ -132,7 +132,6 @@ public:
         return this->type;
     }
 
-    void 
 
     virtual void draw();
     virtual double intersect(Ray, Color &, int);
@@ -171,7 +170,7 @@ Sphere::Sphere(/* args */)
 
 Sphere::Sphere(Point center, double radius, int segments, int stacks)
 {
-    length = radius;
+    this->length = radius;
     this->segments = segments;
     this->stacks = stacks;
     this->reference_point = center;
@@ -184,6 +183,47 @@ Sphere::~Sphere()
 
 void Sphere::draw()
 {
+    Point points[stacks+1][segments+1];
+    int i, j;
+    double h, r;
+    double total_angle = (2.0 * pi);
+    // generate points
+    for (i = 0; i <= this->stacks; i++)
+    {
+        h = this->length * sin(((double)i / (double)stacks) * (pi / 2));
+        r = this->length * cos(((double)i / (double)stacks) * (pi / 2));
+        for (j = 0; j <= this->segments; j++)
+        {
+            points[i][j].x = r * cos(((double)j / (double)this->segments) * total_angle);
+            points[i][j].y = r * sin(((double)j / (double)this->segments) * total_angle);
+            points[i][j].z = h;
+        }
+    }
+    glColor3f(color.red, color.green, color.blue);
+    // draw quads using generated points
+    for (i = 0; i < stacks; i++)
+    {
+        
+        for (j = 0; j < segments; j++)
+        {
+            glBegin(GL_QUADS);
+            {
+                // upper hemisphere
+                glVertex3f(points[i][j].x, points[i][j].y, points[i][j].z);
+                glVertex3f(points[i][j + 1].x, points[i][j + 1].y, points[i][j + 1].z);
+                glVertex3f(points[i + 1][j + 1].x, points[i + 1][j + 1].y, points[i + 1][j + 1].z);
+                glVertex3f(points[i + 1][j].x, points[i + 1][j].y, points[i + 1][j].z);
+                // lower hemisphere
+                
+                glVertex3f(points[i][j].x, points[i][j].y, -points[i][j].z);
+                glVertex3f(points[i][j + 1].x, points[i][j + 1].y, -points[i][j + 1].z);
+                glVertex3f(points[i + 1][j + 1].x, points[i + 1][j + 1].y, -points[i + 1][j + 1].z);
+                glVertex3f(points[i + 1][j].x, points[i + 1][j].y, -points[i + 1][j].z);
+            
+            }
+            glEnd();
+        }
+    }
 }
 
 double Sphere::intersect(Ray ray, Color &color, int level)
@@ -220,6 +260,15 @@ Triangle::Triangle(Point a, Point b, Point c)
 
 void Triangle::draw()
 {
+    glColor3f(this->color.red, this->color.green, this->color.blue);
+
+    glBegin(GL_TRIANGLES);
+    {
+        glVertex3f(this->reference_point.x, this->reference_point.y, this->reference_point.z);
+        glVertex3f(this->reference_point2.x, this->reference_point2.y, this->reference_point2.z);
+        glVertex3f(this->reference_point3.x, this->reference_point3.y, this->reference_point3.z);
+    }
+    glEnd();
 }
 
 double Triangle::intersect(Ray ray, Color &color, int level)
@@ -285,6 +334,7 @@ public:
     Floor(/* args */);
     Floor(double floorwidth, double tilewidth);
     void draw();
+    double intersect(Ray, Color &, int);
     ~Floor();
 };
 
@@ -300,10 +350,50 @@ Floor::Floor(double floorwidth, double tilewidth)
     reference_point.y = -floorwidth / 2;
     reference_point.z = 0.0;
     width = tilewidth;
+    length = floorwidth;
 }
 
 void Floor::draw()
 {
+    int num_row = (int) length/width; // floorwidth/tilewidth
+    int num_col = num_row;
+    for(int i=0; i<num_row; i++) {
+        for(int j=0; j<num_col; j++) {
+            /* drawing square on a plane parallel to x-y plane */
+            Color c;
+            if ((i+j)%2 == 0)
+            {
+                c = this->color;
+            }
+            else 
+            {
+                c.red = 1.0 - this->color.red;
+                c.green = 1.0 - this->color.green;
+                c.blue = 1.0 - this->color.blue;
+            }
+            
+            glColor3f(c.red, c.green, c.blue);
+            Point leftBottomCorner;
+            leftBottomCorner.x = -length/2.0+width*j;
+            leftBottomCorner.y = -length/2.0+width*i;
+            leftBottomCorner.z = 0.0;
+
+            glBegin(GL_QUADS);
+            {
+                glVertex3f(leftBottomCorner.x, leftBottomCorner.y, leftBottomCorner.z);
+                glVertex3f(leftBottomCorner.x+width, leftBottomCorner.y, leftBottomCorner.z);
+                glVertex3f(leftBottomCorner.x+width, leftBottomCorner.y+width, leftBottomCorner.z);
+                glVertex3f(leftBottomCorner.x, leftBottomCorner.y+width, leftBottomCorner.z);
+            }
+            glEnd();
+        }
+    }
+}
+
+
+double Floor::intersect(Ray ray, Color &c, int level)
+{
+    
 }
 
 Floor::~Floor()
