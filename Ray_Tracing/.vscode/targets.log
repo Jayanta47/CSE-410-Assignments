@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Aug 17 04:45:55 2022
+# Make data base, printed on Tue Aug 30 20:46:52 2022
 
 # Variables
 
@@ -22,6 +22,8 @@ SSH_AGENT_LAUNCHER = gnome-keyring
 SNAP_INSTANCE_KEY = 
 # environment
 GJS_DEBUG_OUTPUT = stderr
+# environment
+MANDATORY_PATH = /usr/share/gconf/ubuntu.mandatory.path
 # environment
 LC_NAME = en_US.UTF-8
 # environment
@@ -41,7 +43,7 @@ QT_ACCESSIBILITY = 1
 # environment
 SNAP_INSTANCE_NAME = code
 # environment
-GDK_PIXBUF_MODULEDIR = /snap/code/104/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+GDK_PIXBUF_MODULEDIR = /snap/code/105/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -57,7 +59,7 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = /home/jayanta/.config/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = /home/jayanta/.config/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LANG = C
 # environment
@@ -71,7 +73,7 @@ MAKEFLAGS = pqrR
 # makefile
 CURDIR := /home/jayanta/CSE-410-Assignments/Ray_Tracing
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # automatic
@@ -95,7 +97,7 @@ SNAP_REEXEC =
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 121715
+VSCODE_PID = 24936
 # environment
 XDG_SESSION_TYPE = x11
 # automatic
@@ -103,7 +105,7 @@ XDG_SESSION_TYPE = x11
 # environment
 BAMF_DESKTOP_FILE_HINT = /var/lib/snapd/desktop/applications/code_code.desktop
 # environment
-SESSION_MANAGER = local/jayanta-X510UQR:@/tmp/.ICE-unix/2440,unix/jayanta-X510UQR:/tmp/.ICE-unix/2440
+SESSION_MANAGER = local/jayanta-X510UQR:@/tmp/.ICE-unix/2678,unix/jayanta-X510UQR:/tmp/.ICE-unix/2678
 # automatic
 *F = $(notdir $*)
 # environment
@@ -149,11 +151,11 @@ SNAP_USER_COMMON = /home/jayanta/snap/code/common
 # environment
 LC_TIME = en_US.UTF-8
 # environment
-SNAP = /snap/code/104
+SNAP = /snap/code/105
 # environment
-INVOCATION_ID = d59cc30dfc9648ef85aa2ee2ff6bfb28
+INVOCATION_ID = ed7143b3c040470e9907dd3e675081d2
 # environment
-SNAP_REVISION = 104
+SNAP_REVISION = 105
 # environment
 SNAP_REAL_HOME = /home/jayanta
 # environment
@@ -185,41 +187,43 @@ SNAP_ARCH = amd64
 # makefile
 .DEFAULT_GOAL := all
 # environment
-SYSTEMD_EXEC_PID = 2462
+SYSTEMD_EXEC_PID = 2701
 # environment
 DISPLAY = :1
 # environment
 USER = jayanta
 # environment
 GTK_MODULES = gail:atk-bridge
+# environment
+DEFAULTS_PATH = /usr/share/gconf/ubuntu.default.path
 # default
 MAKE_VERSION := 4.3
 # environment
 DISABLE_WAYLAND = 1
 # environment
-SNAP_DATA = /var/snap/code/104
+SNAP_DATA = /var/snap/code/105
 # environment
 SNAP_CONTEXT = 2KFNKPxa5UBYiAi4TqPIioELq_6G5zrNHusEYDji99YWP37YsdsI
 # environment
-MANAGERPID = 2134
+MANAGERPID = 2366
 # environment
 LC_MEASUREMENT = en_US.UTF-8
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 121669
+GIO_LAUNCHED_DESKTOP_FILE_PID = 24885
 # environment
-_ = /snap/code/104/usr/share/code/code
+_ = /snap/code/105/usr/share/code/code
 # environment
 LC_PAPER = en_US.UTF-8
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
-# makefile (from 'Makefile', line 7)
-CFLAGS = -g -Wall
+# makefile (from 'Makefile', line 8)
+CFLAGS = -g 
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 GDK_PIXBUF_MODULE_FILE = /home/jayanta/snap/code/common/.cache/gdk-pixbuf-loaders.cache
 # environment
-JOURNAL_STREAM = 8:38095
+JOURNAL_STREAM = 8:39165
 # environment
 XDG_SESSION_CLASS = user
 # environment
@@ -231,11 +235,11 @@ QT_IM_MODULE = ibus
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-44797c3d-1.70.1-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-44797c3d-1.70.2-main.sock
 # environment
 SNAP_NAME = code
 # environment
-GSETTINGS_SCHEMA_DIR = /snap/code/104/usr/share/glib-2.0/schemas
+GSETTINGS_SCHEMA_DIR = /snap/code/105/usr/share/glib-2.0/schemas
 # environment
 PAPERSIZE = letter
 # default
@@ -243,11 +247,11 @@ PAPERSIZE = letter
 # automatic
 <F = $(notdir $<)
 # environment
-SNAP_VERSION = 6d9b74a7
+SNAP_VERSION = e4503b30
 # default
 SUFFIXES := 
-# makefile (from 'Makefile', line 9)
-TARGET = Vector.h Camera.h main.cpp
+# makefile (from 'Makefile', line 10)
+TARGET = 1705047_Vector.h 1705047_Camera.h 1705047_classes.h 1705047_main.cpp
 # environment
 VSCODE_CLI = 1
 # environment
@@ -256,14 +260,14 @@ ELECTRON_NO_ATTACH_CONSOLE = 1
 SNAP_COMMON = /var/snap/code/common
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
-# makefile (from 'Makefile', line 8)
+# makefile (from 'Makefile', line 9)
 LINKING = -lglut -lGL -lGLU
 # makefile (from 'Makefile', line 3)
 CXX = g++
 # makefile (from 'Makefile', line 2)
 CC = gcc
 # environment
-SNAP_USER_DATA = /home/jayanta/snap/code/104
+SNAP_USER_DATA = /home/jayanta/snap/code/105
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
@@ -273,7 +277,7 @@ LC_IDENTIFICATION = en_US.UTF-8
 # environment
 SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
 # variable set hash-table stats:
-# Load=131/1024=13%, Rehash=0, Collisions=4/168=2%
+# Load=133/1024=13%, Rehash=0, Collisions=5/170=3%
 
 # Pattern-specific Variable Values
 
@@ -281,10 +285,10 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 
 # Directories
 
- 
-# . (device 2053, inode 393536): 13 files, no impossibilities.
+# . (device 2053, inode 393536): 15 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+ 
+# 15 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -295,7 +299,7 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-15 17:04:21.55571905
+#  Last modified 2022-08-20 14:17:58.154416824
 #  File has been updated.
 #  Successfully updated.
 
@@ -303,7 +307,7 @@ clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 16):
+#  recipe to execute (from 'Makefile', line 17):
 	$(RM) $(TARGET)
 
 # Not a target:
@@ -337,7 +341,7 @@ all:
 # | := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=1/15=7%
-#  recipe to execute (from 'Makefile', line 12):
+#  recipe to execute (from 'Makefile', line 13):
 	$(CXX) $(CFLAGS) -o out $(TARGET) $(LINKING)
 	./out
 
@@ -355,12 +359,12 @@ all:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 19 / storage = 183 B / avg = 9 B
-# current buf: size = 8162 B / used = 183 B / count = 19 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 21 / storage = 231 B / avg = 11 B
+# current buf: size = 8162 B / used = 231 B / count = 21 / avg = 11 B
 
-# strcache performance: lookups = 27 / hit rate = 29%
+# strcache performance: lookups = 29 / hit rate = 27%
 # hash-table stats:
-# Load=19/8192=0%, Rehash=0, Collisions=0/27=0%
-# Finished Make data base on Wed Aug 17 04:45:55 2022
+# Load=21/8192=0%, Rehash=0, Collisions=0/29=0%
+# Finished Make data base on Tue Aug 30 20:46:52 2022
 
  

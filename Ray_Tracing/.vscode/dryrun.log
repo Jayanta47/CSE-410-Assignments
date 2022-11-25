@@ -1,6 +1,6 @@
 make --dry-run --always-make --keep-going --print-directory
 make: Entering directory '/home/jayanta/CSE-410-Assignments/Ray_Tracing'
-g++ -g -Wall -o out Vector.h Camera.h main.cpp -lglut -lGL -lGLU
+g++ -g  -o out 1705047_Vector.h 1705047_Camera.h 1705047_classes.h 1705047_main.cpp -lglut -lGL -lGLU
 ./out
 make: Leaving directory '/home/jayanta/CSE-410-Assignments/Ray_Tracing'
  

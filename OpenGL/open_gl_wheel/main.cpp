@@ -1,4 +1,4 @@
-#include "vector.h"
+#include "Vector.h"
 #include <assert.h>
 
 #define WHEEL_AXLE_HEIGHT 4.0
@@ -277,7 +277,12 @@ void drawWheel()
     {
         glTranslatef(wheelCenter.x, wheelCenter.y, wheelCenter.z);
         glRotatef(wAngleWithXaxis, 0, 0, 1);
+        // glRotatef(30, 0, 0, 1);
         glRotatef(wAxleRotationAngle, 0, 1, 0);
+        // glRotatef(wAxleRotationAngle, 0, 0, 1);
+        // glRotatef(wAngleWithXaxis, 0, 1, 0);
+        
+        // glRotatef(30, 0, 1, 0);
         glRotatef(90, 1, 0, 0);
         drawWheelAxle(WHEEL_AXLE_HEIGHT, WHEEL_RADIUS);
 

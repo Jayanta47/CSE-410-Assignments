@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "Vector.h"
+#include "1705047_Vector.h"
 #include<string>
 
 

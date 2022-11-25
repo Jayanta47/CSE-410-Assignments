@@ -1,19 +1,37 @@
-#include "Vector.h"
-#include "Camera.h"
+#include "1705047_Vector.h"
+#include "1705047_Camera.h"
 #include "1705047_classes.h"
+#include "bitmap_image.hpp"
+
+
 using namespace std;
 
 // global variables initialization
-Point pos, U, R, L;
+extern Point pos;
+Point U, R, L;
 // pos indicates the position of the camera
 // U -> upper vector
 // R -> right indicating vector
 // L -> Look vector
 // Notice: U, R, L are all unit vectors
 
-int imagePixelDimension = 0;
+extern int recursionLevel;
+int imgPxDim = 0;
 int objectsCount = 0;
-int lightsCount = 0;
+int pointLightsCount = 0;
+int spotLightsCount = 0;
+int imageCount = 10;
+
+int windowWidth = 500;
+int windowHeight = 500;
+double fovY;
+
+void capture();
+
+extern std::vector<Object*> objects;
+extern std::vector<PointLight> pointLights;
+extern std::vector<SpotLight> spotLights;
+
 
 void drawAxes()
 {
@@ -67,6 +85,9 @@ void keyboardListener(unsigned char key, int x,int y){
 
 	switch(key){
 
+		case '0':
+			capture();
+			break;
 		case '1':
             change_camera_orientation(L, R, U, "rotate_left");
 			break;
@@ -191,6 +212,15 @@ void display(){
 	drawAxes();
 	drawGrid();
 
+	for(int i=0; i<objects.size(); i++) {
+        objects[i]->draw();
+	}
+
+	/* adding lights */
+	for(int i=0; i<pointLights.size(); i++) {
+        pointLights[i].draw();
+	}
+	// cout<<pointLights.size()<<endl;
 
     // drawSS();
 
@@ -206,11 +236,12 @@ void animate(){
 
 void init(){
 	//codes for initialization
-	drawgrid=1;
+	drawgrid=0;
 	drawaxes=1;
 	cameraHeight=150.0;
 	cameraAngle=1.0;
 	angle=0;
+	fovY = 80.0;
 	// sq_side = 20;
 	// radius_curv = 20;
 
@@ -227,13 +258,13 @@ void init(){
 	glLoadIdentity();
 
 	//give PERSPECTIVE parameters
-	gluPerspective(80,	1,	1,	1000.0);
+	gluPerspective(fovY,	1,	1,	1000.0);
 	//field of view in the Y (vertically)
 	//aspect ratio that determines the field of view in the X direction (horizontally)
 	//near distance
 	//far distance
 
-    pos = Point(100, 100, 0);
+    pos = Point(100, 100, 20);
     U = Point(0, 0, 1);
     R = Point(-1/sqrt(2.0), 1/sqrt(2.0), 0);
     L = Point(-1/sqrt(2.0), -1/sqrt(2.0), 0);
@@ -250,7 +281,7 @@ void loadData() {
     }
 
     /* extracting recursion level & image pixel dimension from input file */
-    input >> recursionLevel >> imagePixelDimension;
+    input >> recursionLevel >> imgPxDim;
 
     /* extracting objects information from input file */
     input >> objectsCount;
@@ -258,11 +289,11 @@ void loadData() {
     string objectShape;
     bool bInvalidObjectShapeFound = false;
 
-    Object object;
+    Object *object = NULL;
 
     for(int i=0; i<objectsCount; i++) {
         input >> objectShape;
-
+		// cout<<objectShape<<endl;
         if(objectShape.compare("sphere") == 0) {
             Point center;
             double radius;
@@ -270,8 +301,9 @@ void loadData() {
             input >> center.x>>center.y>>center.z;
             input >> radius;
 
-            Sphere s(center, radius, 72, 24);
-            object = s;
+			// cout<< center.x<<" "<<center.y<<" "<<center.z<< " rad:"<<radius<<endl;
+
+            object  = new Sphere(center, radius, 72, 24);
         } else if(objectShape.compare("triangle") == 0) {
             Point a, b, c;
 
@@ -279,20 +311,28 @@ void loadData() {
             input >> b.x>>b.y>>b.z;
             input >> c.x>>c.y>>c.z;
 
-            Triangle t(a, b, c);
-            object = t;
+			// cout<<a.x<<" "<<a.y<<" "<<a.z<<endl;
+			// cout<<b.x<<" "<<b.y<<" "<<b.z<<endl;
+			// cout<<c.x<<" "<<c.y<<" "<<c.z<<endl;
+			// cout<<endl;
+
+            object = new Triangle(a, b, c);
+            // object = t;
         } 
-        // else if(objectShape.compare("general") == 0) {
-        //     GeneralQuadricSurfaceCoefficient coefficient;
-        //     Point cubeReferencePoint;
-        //     double length, width, height;
+        else if(objectShape.compare("general") == 0) {
+            gQuadCoeff gQCoeff;
+            Point cubeReferencePoint;
+            double length, width, height;
 
-        //     input >> coefficient;
-        //     input >> cubeReferencePoint;
-        //     input >> length >> width >> height;
+            input >> gQCoeff.a >> gQCoeff.b >> gQCoeff.c>>gQCoeff.d>>gQCoeff.e>>gQCoeff.f>>gQCoeff.g>>gQCoeff.h>>gQCoeff.i>>gQCoeff.j;
+            input >> cubeReferencePoint.x >>cubeReferencePoint.y>>cubeReferencePoint.z;
+            input >> length >> width >> height;
 
-        //     object = new GeneralQuadricSurface(coefficient, cubeReferencePoint, length, width, height);
-        // }
+			// cout<<gQCoeff.a <<" "<< gQCoeff.b <<" "<<  gQCoeff.c<<" "<<gQCoeff.d<<" "<<gQCoeff.e<<" "<<gQCoeff.f<<" "<<gQCoeff.g<<" "<<gQCoeff.h<<" "<<gQCoeff.i<<" "<<gQCoeff.j<<endl;
+			// cout<<cubeReferencePoint.x <<" "<< cubeReferencePoint.y<<" "<< cubeReferencePoint.z<<endl;;
+			// cout<<length <<" "<< width <<" "<< height<<endl;;
+            object = new GeneralQuadSurface(gQCoeff, length, width, height, cubeReferencePoint);
+        }
         else if (objectShape.compare("")==0) {
             continue;
         } 
@@ -310,13 +350,13 @@ void loadData() {
         input >> refco.ambientCoeff >> refco.diffuseCoeff >> refco.specularCoeff>> refco.recursiveCoeff;
         input >> shininess;
 
-        object.setColor(color);
-        object.setReflectionCoefficient(refco);
-        object.setShininess(shininess);
+        object->setColor(color);
+        object->setReflectionCoefficient(refco);
+        object->setShininess(shininess);
 
         objects.push_back(object);
     }
-    // object = NULL;
+    object = NULL;
 
     // if(bInvalidObjectShapeFound) {
     //     clearObjects();
@@ -325,9 +365,9 @@ void loadData() {
     // }
 
     /* extracting light sources information from input file */
-    input >> lightsCount;
+    input >> pointLightsCount;
 
-    for(int i=0; i<lightsCount; i++) {
+    for(int i=0; i<pointLightsCount; i++) {
         Point position;
         Color color;
 
@@ -336,21 +376,144 @@ void loadData() {
 
         pointLights.push_back(PointLight(position, color));
     }
+
+	input >> spotLightsCount;
+	for (int i=0; i< spotLightsCount; i++)
+	{
+		Point position;
+		Color color;
+		int cutOffAngle; // in degrees
+		Point direction;
+
+		input >> position.x >> position.y >> position.z;
+		input >> color.red >> color.green >> color.blue;
+		input >> direction.x >> direction.y >> direction.z;
+		input >> cutOffAngle;
+
+		PointLight p(position, color);
+		spotLights.push_back(SpotLight(p, direction, cutOffAngle));
+	}
+
     input.close();
 
     /* creating a floor object and pushing it to objects vector */
-    Floor f(1000.0, 20.0);  // color = black
-    object = f;
-    object.setColor(Color(1.0, 1.0, 1.0));  // color = white
-    object.setReflectionCoefficient(ReflectionCoeff(0.25, 0.25, 0.25, 0.25));
-    object.setShininess(15);
+
+    object = new Floor(1000.0, 20.0);
+    object->setColor(Color(1.0, 1.0, 1.0));  // color = white
+    object->setReflectionCoefficient(ReflectionCoeff(0.25, 0.25, 0.25, 0.25));
+    object->setShininess(15);
 
     objects.push_back(object);
+	object = NULL;
+	// cout<<"lights:"<<pointLights.size()<<endl;
+}
+
+
+void capture()
+{
+	bitmap_image image(imgPxDim, imgPxDim);
+
+	// initialize bitmap image and set background color
+	for(int j=0; j<imgPxDim; j++) {
+        for(int i=0; i<imgPxDim; i++) {
+            image.set_pixel(j, i, 0, 0, 0);  // color = black
+        }
+    }
+
+	double planeDistance = (windowHeight/2.0)/(tan((fovY*pi)/(2.0*180)));
+
+	// topleft = eye + l*planeDistance - r*windowWidth/2 + u*windowHeight/2
+	
+	Point l = L.returnCopy();
+	Point r = R.returnCopy();
+	Point u = U.returnCopy();
+
+	l.scalarMult(planeDistance);
+	r.scalarMult(windowWidth/2.0);
+	u.scalarMult(windowHeight/2.0);
+
+	l.addVector(r, -1);
+	l.addVector(u);
+
+	Point topLeft = pos.addVectorCopy(l);
+
+	double du = ((double) windowWidth/imgPxDim);
+    double dv = ((double) windowHeight/imgPxDim);
+
+	// topleft = topleft + r*(0.5*du) - u*(0.5*dv)
+
+	r = R.returnCopy();
+	r.scalarMult(0.5*du);
+
+	u = U.returnCopy();
+	u.scalarMult(0.5*dv);
+
+	r.addVector(u, -1);
+	topLeft.addVector(r);
+
+	int ctr = 0;
+
+	for (int j = 0; j < imgPxDim; j++)
+	{
+		for (int i=0; i< imgPxDim; i++)
+		{
+			// r = R.returnCopy();
+			// r.scalarMult(j*du);
+
+			// u = U.returnCopy();
+			// u.scalarMult(i*dv);
+
+			// r.addVector(u, -1);
+
+			// Point curPixel = topLeft.returnCopy();
+			// curPixel.addVector(r);
+
+			Point curPixel = topLeft.addVectorCopy(R.scalarMultCopy(j*du)).addVectorCopy(U.scalarMultCopy(i*du), -1);
+
+			Point curPixelDiffWithPos = curPixel.addVectorCopy(pos, -1);
+			Ray ray(pos, curPixelDiffWithPos);
+
+			int nearest = INT32_MAX; 
+			double t, tMin=INF;
+
+			for(int i=0; i<objects.size(); i++) {
+                Color color;  // color = black
+                t = objects[i]->intersect(ray, color, 0);
+
+				// if (objects[i]->get_type() == "Floor") ctr++;
+
+                if(t>0.0 && t<tMin) {
+                    tMin = t;
+                    nearest = i;
+                }
+            }
+
+			if(nearest != INT32_MAX) {
+                Color color;  // color = black
+                tMin = objects[nearest]->intersect(ray, color, 1);
+				if (objects[nearest]->get_type() == "Floor") {
+					ctr++;
+					// image.set_pixel(j, i, 255.0, 255.0, 255.0);
+					// continue;
+				}
+                image.set_pixel(j, i, (int) round(color.red*255.0), (int) round(color.green*255.0), (int) round(color.blue*255.0));
+            }
+		}
+	}
+
+	stringstream oss;
+	imageCount++;
+	oss<<imageCount;
+	string image_name = "output_"+ oss.str()+".bmp";
+	image.save_image("./output/"+image_name);
+
+	cout<<"image saved "<<endl;
+
 }
 
 int main(int argc, char **argv){
 	glutInit(&argc,argv);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(windowWidth, windowHeight);
 	glutInitWindowPosition(0, 0);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);	//Depth, Double buffer, RGB color
 
@@ -366,6 +529,8 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(keyboardListener);
 	glutSpecialFunc(specialKeyListener);
 	glutMouseFunc(mouseListener);
+
+	loadData();
 
 	glutMainLoop();		//The main loop of OpenGL
 
